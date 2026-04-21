@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relatório Analítico {{ relatorio.numero_relatorio }}</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 0px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 2px;
+            line-height: 1.0;
+        }
+        .title {
+            text-align: center;
+            background: #003366;
+            color: white;
+            padding: 2px;
+            margin: 2px 0;
+        }
+        .section {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            padding: 15px;
+        }
+        .section-title {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .field {
+            margin: 10px 0;
+        }
+        .field-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+        .pessoa-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        @media print {
+            body {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+{% load static %}
+
+<table style="width: 100%; text-align: center;">
+    <tr>
+        <td>
+            
+            <img src="{% static 'relatorio_analitico/imagem/brasao_pmma.png' %}" width="70">
+        </td>
+        <td>
+            <img src="{% static 'relatorio_analitico/imagem/brasao_estado.png' %}" width="70">
+        </td>
+        <td>
+            <img src="{% static 'relatorio_analitico/imagem/brasao_11bpm.png' %}" width="70">
+        </td>
+    </tr>
+</table>
+    <div class="header">
+        <h4>ESTADO DO MARANHÃO</h4>
+        <h4>SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h4>
+        <h4>POLÍCIA MILITAR DO MARANHÃO</h4>
+        <h4>COMANDO DO POLICIAMENTO DO INTERIOR - CPI</h4>
+        <h4>COMANDO DO POLICIAMENTO DE ÁREA DO INTERIOR – CPA/I 04</h4>
+        <h4>11º BATALHÃO DE POLÍCIA MILITAR – 4ª CIA MATOES</h4>
+    </div>
+    
+    <div class="title">
+        <h2>RELATÓRIO ANALÍTICO Nº {{ relatorio.numero_relatorio }} - 11º BPM/4ª CIA</h2>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">DADOS INFORMATIVOS</div>
+        <div class="field"><span class="field-label">Código/Tipo da ocorrência:</span> {{ relatorio.codigo_ocorrencia|default:"Não informado" }}</div>
+        <div class="field"><span class="field-label">Local:</span> {{ relatorio.local|default:"Não informado" }}</div>
+        <div class="field"><span class="field-label">Data/Hora:</span> {{ relatorio.data_ocorrencia|date:"d/m/Y" }} {{ relatorio.hora_ocorrencia|time:"H:i" }}</div>
+        <div class="field"><span class="field-label">Instrumento usado:</span> {{ relatorio.instrumento_usado|default:"Não informado" }}</div>
+        <div class="field"><span class="field-label">Materiais apreendidos:</span> {{ relatorio.materiais_apreendidos|default:"Não informado" }}</div>
+        <div class="field"><span class="field-label">Solução:</span> {{ relatorio.get_solucao_resumo }}</div>
+        <div class="field"><span class="field-label">Viaturas/Guarnições:</span> {{ relatorio.viaturas_guarnicoes|default:"Não informado" }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">PESSOAS ENVOLVIDAS</div>
+        {% for pessoa in relatorio.pessoas.all %}
+        <div class="pessoa-item">
+            <strong>Tipo:</strong> {{ pessoa.get_tipo_display }}<br>
+            <strong>Nome:</strong> {{ pessoa.nome }}<br>
+            <strong>CPF:</strong> {{ pessoa.cpf|default:"Não informado" }}<br>
+            <strong>RG:</strong> {{ pessoa.rg|default:"Não informado" }}<br>
+            <strong>Endereço:</strong> {{ pessoa.endereco|default:"Não informado" }}<br>
+            <strong>Nome da mãe:</strong> {{ pessoa.nome_mae|default:"Não informado" }}
+        </div>
+        {% empty %}
+        <div>Nenhuma pessoa envolvida informada</div>
+        {% endfor %}
+    </div>
+    
+    <div class="section">
+        <div class="section-title">RELATO DA OCORRÊNCIA</div>
+        <div>{{ relatorio.relato|default:"Não informado"|linebreaks }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">PROVIDÊNCIAS ADOTADAS</div>
+        <div>{{ relatorio.providencias|default:"Não informado"|linebreaks }}</div>
+    </div>
+    
+    <div class="footer" style="margin-top: 50px; text-align: center;">
+        <p>_________________________________</p>
+        <p>Responsável pelo Relatório</p>
+        <p style="font-size: 12px;">{{ relatorio.criado_em|date:"d/m/Y H:i" }}</p>
+    </div>
+</body>
+</html>

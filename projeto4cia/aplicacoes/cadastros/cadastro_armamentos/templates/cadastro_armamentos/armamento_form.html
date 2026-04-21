@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar{% else %}Novo{% endif %} Armamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h4>
+                <i class="bi bi-shield-plus me-2"></i>
+                {% if object %}Editar{% else %}Novo{% endif %} Armamento
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Nº Série</label>
+                        {{ form.numero_serie }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tipo</label>
+                        {{ form.tipo }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Calibre</label>
+                        {{ form.calibre }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Marca</label>
+                        {{ form.marca }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Modelo</label>
+                        {{ form.modelo }}
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Patrimônio</label>
+                        {{ form.patrimonio }}
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Registro</label>
+                        {{ form.registro }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Capacidade (tiros)</label>
+                        {{ form.capacidade }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Cano (cm)</label>
+                        {{ form.comprimento_cano }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="form-check mt-4">
+                            {{ form.ativo }}
+                            <label class="form-check-label">Ativo?</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Observações</label>
+                        {{ form.observacoes }}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-2"></i>Salvar
+                    </button>
+                    <a href="{% url 'cadastro_armamentos:armamento_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

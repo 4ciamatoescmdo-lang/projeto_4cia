@@ -1,0 +1,455 @@
+<!-- templates/cadastro_veiculo_apreendido/form_veiculo.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .nav-tabs .nav-link {
+        color: #495057;
+        font-weight: 500;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    .tab-pane {
+        padding: 20px 0;
+    }
+    .checklist-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    .card-checklist {
+        background-color: #f8f9fc;
+        border-left: 4px solid #0d6efd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    .form-check-input {
+        margin-right: 10px;
+        transform: scale(1.1);
+        cursor: pointer;
+    }
+    .form-check-label {
+        cursor: pointer;
+        font-weight: normal;
+    }
+    .section-title {
+        background-color: #e9ecef;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 20px 0 15px 0;
+        font-weight: bold;
+        border-left: 4px solid #0d6efd;
+    }
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 5px;
+    }
+    .alert-warning {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+    }
+    .alert-danger {
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+    }
+    .alert-info {
+        background-color: #d1ecf1;
+        border-left: 4px solid #0dcaf0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>{{ titulo }}</h1>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-car-front-fill"></i> Formulário de Apreensão de Veículo</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="formApreensao">
+                        {% csrf_token %}
+                        
+                        <!-- Abas Bootstrap 5 -->
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="basico-tab" data-bs-toggle="tab" data-bs-target="#basico" type="button" role="tab">
+                                    <i class="bi bi-info-circle"></i> Dados Básicos
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="vistoria-tab" data-bs-toggle="tab" data-bs-target="#vistoria" type="button" role="tab">
+                                    <i class="bi bi-clipboard-check"></i> Vistoria Técnica
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="itens-tab" data-bs-toggle="tab" data-bs-target="#itens" type="button" role="tab">
+                                    <i class="bi bi-tools"></i> Itens e Equipamentos
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="condutor-tab" data-bs-toggle="tab" data-bs-target="#condutor" type="button" role="tab">
+                                    <i class="bi bi-person-badge"></i> Dados do Condutor
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="avarias-tab" data-bs-toggle="tab" data-bs-target="#avarias" type="button" role="tab">
+                                    <i class="bi bi-car-front"></i> Avarias e Observações
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="myTabContent">
+                            <!-- Aba 1: Dados Básicos -->
+                            <div class="tab-pane fade show active" id="basico" role="tabpanel">
+                                <div class="row mt-3">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.placa.id_for_label }}" class="form-label required-field">Placa</label>
+                                        {{ form.placa }}
+                                        {% if form.placa.errors %}
+                                            <div class="alert alert-danger mt-1">{{ form.placa.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+    <label for="{{ form.chassi.id_for_label }}" class="form-label">Chassi</label>
+    {{ form.chassi }}
+</div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.modelo.id_for_label }}" class="form-label required-field">Modelo</label>
+                                        {{ form.modelo }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.cor.id_for_label }}" class="form-label required-field">Cor</label>
+                                        {{ form.cor }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.ano.id_for_label }}" class="form-label required-field">Ano</label>
+                                        {{ form.ano }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.data_apreensao.id_for_label }}" class="form-label required-field">Data Apreensão</label>
+                                        {{ form.data_apreensao }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.local_apreensao.id_for_label }}" class="form-label required-field">Local Apreensão</label>
+                                        {{ form.local_apreensao }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 2: Vistoria Técnica -->
+                            <div class="tab-pane fade" id="vistoria" role="tabpanel">
+                                <div class="alert alert-info mt-3">
+                                    <i class="bi bi-info-circle-fill"></i> <strong>Importante:</strong> Preencha todos os campos abaixo com a condição atual do veículo no momento da apreensão.
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.km_atual_apreensao.id_for_label }}" class="form-label">{{ form.km_atual_apreensao.label }}</label>
+                                        {{ form.km_atual_apreensao }}
+                                        <small class="form-text text-muted">Registre a quilometragem exata do painel</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.nivel_combustivel.id_for_label }}" class="form-label">{{ form.nivel_combustivel.label }}</label>
+                                        {{ form.nivel_combustivel }}
+                                    </div>
+                                </div>
+
+                                <div class="section-title">
+                                    <i class="bi bi-car-front"></i> Condições Gerais do Veículo
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.condicao_pneus.id_for_label }}" class="form-label">{{ form.condicao_pneus.label }}</label>
+                                        {{ form.condicao_pneus }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.condicao_vidros.id_for_label }}" class="form-label">{{ form.condicao_vidros.label }}</label>
+                                        {{ form.condicao_vidros }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.condicao_lataria.id_for_label }}" class="form-label">{{ form.condicao_lataria.label }}</label>
+                                        {{ form.condicao_lataria }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.condicao_motor.id_for_label }}" class="form-label">{{ form.condicao_motor.label }}</label>
+                                        {{ form.condicao_motor }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.condicao_interna.id_for_label }}" class="form-label">{{ form.condicao_interna.label }}</label>
+                                        {{ form.condicao_interna }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 3: Itens e Equipamentos -->
+                            <div class="tab-pane fade" id="itens" role="tabpanel">
+                                <div class="section-title mt-3">
+                                    <i class="bi bi-check-circle-fill text-success"></i> Itens Obrigatórios por Lei (Resolução CONTRAN)
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card-checklist">
+                                            <div class="checklist-item">
+                                                {{ form.estepe_presente }}
+                                                <label for="{{ form.estepe_presente.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Estepe</strong> - Pneu sobressalente
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.macaco_presente }}
+                                                <label for="{{ form.macaco_presente.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Macaco</strong> - Ferramenta para troca de pneu
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.chave_roda_presente }}
+                                                <label for="{{ form.chave_roda_presente.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Chave de Roda</strong> - Chave para remover parafusos
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.triangulo_presente }}
+                                                <label for="{{ form.triangulo_presente.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Triângulo de Sinalização</strong>
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.cinto_seguranca_funcionando }}
+                                                <label for="{{ form.cinto_seguranca_funcionando.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Cintos de Segurança</strong> - Todos funcionando
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="card-checklist">
+                                            <div class="checklist-item">
+                                                {{ form.radio_funcionando }}
+                                                <label for="{{ form.radio_funcionando.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Rádio/Multimídia</strong>
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.ar_condicionado_funcionando }}
+                                                <label for="{{ form.ar_condicionado_funcionando.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Ar Condicionado</strong>
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.direcao_funcionando }}
+                                                <label for="{{ form.direcao_funcionando.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Direção</strong> (Hidráulica/Elétrica)
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.trava_eletrica_funcionando }}
+                                                <label for="{{ form.trava_eletrica_funcionando.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Travas Elétricas</strong>
+                                                </label>
+                                            </div>
+                                            <div class="checklist-item">
+                                                {{ form.vidro_eletrico_funcionando }}
+                                                <label for="{{ form.vidro_eletrico_funcionando.id_for_label }}" class="form-check-label">
+                                                    <strong>✓ Vidros Elétricos</strong>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-title mt-4">
+                                    <i class="bi bi-file-text-fill"></i> Documentação do Veículo
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card-checklist">
+                                            <div class="checklist-item">
+                                                {{ form.crlv_apresentado }}
+                                                <label for="{{ form.crlv_apresentado.id_for_label }}" class="form-check-label">
+                                                    <strong>📄 CRLV</strong> - Certificado de Registro e Licenciamento do Veículo
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card-checklist">
+                                            <div class="checklist-item">
+                                                {{ form.crv_apresentado }}
+                                                <label for="{{ form.crv_apresentado.id_for_label }}" class="form-check-label">
+                                                    <strong>📄 CRV</strong> - Certificado de Registro do Veículo (Documento de propriedade)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mb-3 mt-3">
+                                        <label for="{{ form.cnh_condutor.id_for_label }}" class="form-label">{{ form.cnh_condutor.label }}</label>
+                                        {{ form.cnh_condutor }}
+                                        <small class="form-text text-muted">Número da Carteira Nacional de Habilitação do condutor</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 4: Dados do Condutor -->
+                            <div class="tab-pane fade" id="condutor" role="tabpanel">
+                                <div class="alert alert-warning mt-3">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Atenção!</strong> Preencha com os dados do condutor no momento da apreensão.
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.condutor_nome.id_for_label }}" class="form-label">{{ form.condutor_nome.label }}</label>
+                                        {{ form.condutor_nome }}
+                                        <small class="form-text text-muted">Nome completo conforme documento de identificação</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.condutor_cpf.id_for_label }}" class="form-label">{{ form.condutor_cpf.label }}</label>
+                                        {{ form.condutor_cpf }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.condutor_rg.id_for_label }}" class="form-label">{{ form.condutor_rg.label }}</label>
+                                        {{ form.condutor_rg }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.condutor_endereco.id_for_label }}" class="form-label">{{ form.condutor_endereco.label }}</label>
+                                        {{ form.condutor_endereco }}
+                                    </div>
+                                </div>
+
+                                <div class="section-title">
+                                    <i class="bi bi-people-fill"></i> Testemunhas (Opcional mas recomendado)
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.testemunha_nome.id_for_label }}" class="form-label">{{ form.testemunha_nome.label }}</label>
+                                        {{ form.testemunha_nome }}
+                                        <small class="form-text text-muted">Nome de uma testemunha presente na apreensão</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.testemunha_cpf.id_for_label }}" class="form-label">{{ form.testemunha_cpf.label }}</label>
+                                        {{ form.testemunha_cpf }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 5: Avarias e Observações -->
+                            <div class="tab-pane fade" id="avarias" role="tabpanel">
+                                <div class="alert alert-danger mt-3">
+                                    <i class="bi bi-exclamation-octagon-fill"></i> <strong>IMPORTANTE!</strong> Descreva DETALHADAMENTE qualquer avaria, amassado, arranhão ou peça quebrada. Quanto mais detalhes, mais protegido você estará juridicamente.
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.avarias_descricao.id_for_label }}" class="form-label">{{ form.avarias_descricao.label }}</label>
+                                        {{ form.avarias_descricao }}
+                                        <small class="form-text text-muted">
+                                            <strong>Exemplos:</strong> "Amassado na porta dianteira esquerda (aproximadamente 10cm)", 
+                                            "Arranhão profundo no para-choque traseiro lado direito", 
+                                            "Farol dianteiro direito quebrado", 
+                                            "Rádio original não está funcionando"
+                                        </small>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.observacoes.id_for_label }}" class="form-label">{{ form.observacoes.label }}</label>
+                                        {{ form.observacoes }}
+                                        <small class="form-text text-muted">Qualquer outra informação relevante sobre a apreensão</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-save"></i> Salvar Apreensão
+                                </button>
+                                <a href="{% url 'cadastro_veiculo_apreendido:lista' %}" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicializar as abas do Bootstrap 5 (já funciona automaticamente com data-bs-toggle)
+        
+        // Máscara para CPF do condutor
+        $('[name="condutor_cpf"]').on('input', function() {
+            let value = $(this).val().replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                $(this).val(value);
+            }
+        });
+        
+        // Máscara para CPF da testemunha
+        $('[name="testemunha_cpf"]').on('input', function() {
+            let value = $(this).val().replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                $(this).val(value);
+            }
+        });
+        
+        // Validação antes de salvar
+        $('#formApreensao').on('submit', function(e) {
+            var avarias = $('[name="avarias_descricao"]').val();
+            if (!avarias || avarias.trim() === '') {
+                if (!confirm('ATENÇÃO! Você não descreveu nenhuma avaria.\n\nO veículo está em PERFEITO estado?\n\nClique em OK para continuar ou Cancelar para descrever avarias.')) {
+                    e.preventDefault();
+                    // Mudar para a aba de avarias
+                    var avariasTab = new bootstrap.Tab(document.getElementById('avarias-tab'));
+                    avariasTab.show();
+                    return false;
+                }
+            }
+            
+            // Verificar se a quilometragem foi informada
+            var km = $('[name="km_atual_apreensao"]').val();
+            if (!km) {
+                if (!confirm('ATENÇÃO! Quilometragem não informada.\n\nDeseja continuar sem registrar a quilometragem?')) {
+                    e.preventDefault();
+                    var vistoriaTab = new bootstrap.Tab(document.getElementById('vistoria-tab'));
+                    vistoriaTab.show();
+                    return false;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

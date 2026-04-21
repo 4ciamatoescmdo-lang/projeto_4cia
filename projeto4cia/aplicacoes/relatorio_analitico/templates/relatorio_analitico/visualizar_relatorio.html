@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Visualizar Relatório {{ relatorio.numero_relatorio }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- TABELA COM 3 COLUNAS - LOGOS DENTRO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                <tr>
+                    <!-- COLUNA 1 -->
+                    <td style="text-align: center; vertical-align: middle; padding: 15px; border: 1px solid #000; width: 33.33%;">
+                        <img src="{% static 'relatorio_analitico/imagem/brasao_estado.png' %}" alt="Brasão do Estado" style="max-width: 80px; max-height: 80px; margin-bottom: 10px;" onerror="this.style.display='none'">
+                        <div style="font-weight: bold; font-size: 14px;">ESTADO DO MARANHÃO</div>
+                        <div style="font-size: 12px; color: #555;">SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</div>
+                    </td>
+                    
+                    <!-- COLUNA 2 -->
+                    <td style="text-align: center; vertical-align: middle; padding: 15px; border: 1px solid #000; width: 33.33%;">
+                        <img src="{% static 'relatorio_analitico/imagem/brasao_pmma.png' %}" alt="Brasão PMMA" style="max-width: 80px; max-height: 80px; margin-bottom: 10px;" onerror="this.style.display='none'">
+                        <div style="font-weight: bold; font-size: 14px;">POLÍCIA MILITAR DO MARANHÃO</div>
+                        <div style="font-size: 12px; color: #555;">COMANDO DO POLICIAMENTO DO INTERIOR - CPI<br>COMANDO DO POLICIAMENTO DE ÁREA DO INTERIOR – CPA/I 04</div>
+                    </td>
+                    
+                    <!-- COLUNA 3 -->
+                    <td style="text-align: center; vertical-align: middle; padding: 15px; border: 1px solid #000; width: 33.33%;">
+                        <img src="{% static 'relatorio_analitico/imagem/brasao_11bpm.png' %}" alt="Brasão 11º BPM" style="max-width: 80px; max-height: 80px; margin-bottom: 10px;" onerror="this.style.display='none'">
+                        <div style="font-weight: bold; font-size: 14px;">11º BATALHÃO DE POLÍCIA MILITAR</div>
+                        <div style="font-size: 12px; color: #555;">4ª CIA - MATOES</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Relatório Analítico Nº {{ relatorio.numero_relatorio }}</h4>
+                </div>
+                <div class="card-body">
+                    <h5>Dados Informativos</h5>
+                    <p><strong>Código/Tipo:</strong> {{ relatorio.codigo_ocorrencia|default:"Não informado" }}</p>
+                    <p><strong>Local:</strong> {{ relatorio.local }}</p>
+                    <p><strong>Data/Hora:</strong> {{ relatorio.data_ocorrencia|date:"d/m/Y" }} às {{ relatorio.hora_ocorrencia|time:"H:i" }}</p>
+                    <p><strong>Instrumento usado:</strong> {{ relatorio.instrumento_usado|default:"Não informado" }}</p>
+                    <p><strong>Materiais apreendidos:</strong> {{ relatorio.materiais_apreendidos|default:"Não informado" }}</p>
+                    <p><strong>Viaturas/Guarnições:</strong> {{ relatorio.viaturas_guarnicoes|default:"Não informado" }}</p>
+                    
+                    <h5 class="mt-4">Pessoas Envolvidas</h5>
+                    {% for pessoa in relatorio.pessoas.all %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <p><strong>Tipo:</strong> {{ pessoa.get_tipo_display }}</p>
+                            <p><strong>Nome:</strong> {{ pessoa.nome }}</p>
+                            <p><strong>CPF:</strong> {{ pessoa.cpf|default:"Não informado" }}</p>
+                            <p><strong>RG:</strong> {{ pessoa.rg|default:"Não informado" }}</p>
+                            <p><strong>Endereço:</strong> {{ pessoa.endereco|default:"Não informado" }}</p>
+                            <p><strong>Nome da mãe:</strong> {{ pessoa.nome_mae|default:"Não informado" }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>Nenhuma pessoa envolvida informada.</p>
+                    {% endfor %}
+                    
+                    <h5 class="mt-4">Relato da Ocorrência</h5>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            {{ relatorio.relato|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-4">Providências Adotadas</h5>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            {{ relatorio.providencias|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'relatorio_analitico:lista_relatorios' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                        <a href="{% url 'relatorio_analitico:imprimir_relatorio' relatorio.pk %}" class="btn btn-success" target="_blank">
+                            <i class="fas fa-print"></i> Imprimir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

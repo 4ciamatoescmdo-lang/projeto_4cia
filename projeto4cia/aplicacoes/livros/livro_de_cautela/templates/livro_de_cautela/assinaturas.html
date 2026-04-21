@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Assinar Relatório{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Assinar Relatório #{{ relatorio.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p><strong>Relatório gerado em:</strong> {{ relatorio.data_criacao|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Policial Substituto:</strong> {{ relatorio.policial.nome_guerra }}</p>
+                        <p><strong>Tipo de Alteração:</strong> {{ relatorio.tipo_alteracao }}</p>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Assinatura de quem passou -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5>Assinatura de Quem Passou o Serviço</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>{{ policial_logado }}</strong></p>
+                                    <div class="signature-pad-container">
+                                        <canvas id="signatureCanvasPassou" class="signature-canvas" width="400" height="200" style="border: 2px solid #ccc; border-radius: 5px;"></canvas>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-secondary" onclick="clearSignature('passou')">Limpar</button>
+                                            <button type="button" class="btn btn-sm btn-info" onclick="loadSavedSignature('passou')">Carregar Assinatura Salva</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Assinatura de quem recebeu -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5>Assinatura de Quem Recebeu o Serviço</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>{{ relatorio.policial.nome_guerra }}</strong></p>
+                                    <div class="signature-pad-container">
+                                        <canvas id="signatureCanvasRecebeu" class="signature-canvas" width="400" height="200" style="border: 2px solid #ccc; border-radius: 5px;"></canvas>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-secondary" onclick="clearSignature('recebeu')">Limpar</button>
+                                            <button type="button" class="btn btn-sm btn-info" onclick="loadSavedSignature('recebeu')">Carregar Assinatura Salva</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <button type="button" class="btn btn-success btn-lg" onclick="saveSignatures()">
+                                <i class="fas fa-save"></i> Salvar Assinaturas
+                            </button>
+                            <button type="button" class="btn btn-danger btn-lg" onclick="window.location.href='{% url 'livro_de_cautela:visualizar_relatorio' relatorio.id %}'">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir Signature Pad JS -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+<script>
+// Inicializar os Signature Pads
+let signaturePadPassou = null;
+let signaturePadRecebeu = null;
+
+// Dados do policial logado e substituto
+const policialLogadoId = {{ request.user.policial.id|default:'null' }};
+const policialSubstitutoId = {{ relatorio.policial.id|default:'null' }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar canvas para quem passou
+    const canvasPassou = document.getElementById('signatureCanvasPassou');
+    if (canvasPassou) {
+        signaturePadPassou = new SignaturePad(canvasPassou, {
+            backgroundColor: 'white',
+            penColor: 'black',
+            minWidth: 1,
+            maxWidth: 2
+        });
+    }
+    
+    // Inicializar canvas para quem recebeu
+    const canvasRecebeu = document.getElementById('signatureCanvasRecebeu');
+    if (canvasRecebeu) {
+        signaturePadRecebeu = new SignaturePad(canvasRecebeu, {
+            backgroundColor: 'white',
+            penColor: 'black',
+            minWidth: 1,
+            maxWidth: 2
+        });
+    }
+    
+    // Ajustar tamanho dos canvases
+    resizeCanvases();
+    window.addEventListener('resize', resizeCanvases);
+});
+
+function resizeCanvases() {
+    const canvases = document.querySelectorAll('.signature-canvas');
+    canvases.forEach(canvas => {
+        const container = canvas.parentElement;
+        const containerWidth = container.clientWidth;
+        canvas.width = Math.min(containerWidth - 20, 500);
+        canvas.height = 200;
+    });
+}
+
+function clearSignature(who) {
+    if (who === 'passou' && signaturePadPassou) {
+        signaturePadPassou.clear();
+    } else if (who === 'recebeu' && signaturePadRecebeu) {
+        signaturePadRecebeu.clear();
+    }
+}
+
+function loadSavedSignature(who) {
+    let policialId = null;
+    let pad = null;
+    
+    if (who === 'passou') {
+        policialId = policialLogadoId;
+        pad = signaturePadPassou;
+    } else {
+        policialId = policialSubstitutoId;
+        pad = signaturePadRecebeu;
+    }
+    
+    if (!policialId) {
+        alert('Policial não encontrado para carregar assinatura salva.');
+        return;
+    }
+    
+    // Fazer requisição para buscar a assinatura salva do policial
+    fetch(`/policiais/${policialId}/assinatura/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.assinatura) {
+                // Carregar a imagem da assinatura no canvas
+                const img = new Image();
+                img.onload = function() {
+                    pad.clear();
+                    pad.fromDataURL(data.assinatura);
+                };
+                img.src = data.assinatura;
+            } else {
+                alert('Este policial ainda não possui uma assinatura salva no sistema.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar assinatura:', error);
+            alert('Erro ao carregar assinatura salva.');
+        });
+}
+
+function saveSignatures() {
+    // Verificar se as assinaturas foram feitas
+    if (signaturePadPassou.isEmpty()) {
+        alert('Por favor, assine o campo de quem passou o serviço.');
+        return;
+    }
+    
+    if (signaturePadRecebeu.isEmpty()) {
+        alert('Por favor, assine o campo de quem recebeu o serviço.');
+        return;
+    }
+    
+    // Obter as assinaturas em base64
+    const assinaturaPassou = signaturePadPassou.toDataURL();
+    const assinaturaRecebeu = signaturePadRecebeu.toDataURL();
+    
+    // Enviar para o servidor
+    fetch('{% url "livro_de_cautela:salvar_assinaturas" relatorio.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            assinatura_passou: assinaturaPassou,
+            assinatura_recebeu: assinaturaRecebeu
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Assinaturas salvas com sucesso!');
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Erro ao salvar assinaturas: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao salvar assinaturas.');
+    });
+}
+</script>
+
+<style>
+.signature-canvas {
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    cursor: crosshair;
+    background-color: white;
+    width: 100%;
+    height: auto;
+}
+</style>
+{% endblock %}

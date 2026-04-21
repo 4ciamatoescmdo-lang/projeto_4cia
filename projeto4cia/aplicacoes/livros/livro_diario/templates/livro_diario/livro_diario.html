@@ -1,0 +1,2016 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Livro Diário - 4ª CIA/11º BPM{% endblock %}
+
+{% block content %}
+<form id="form-livro-diario" method="post">
+    {% csrf_token %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <!-- Logotipo -->
+            <img src="{% static 'livro_de_cautela/image.png' %}" alt="Logotipo" class="mb-4" width="150" height="auto">
+            
+            <h4>ESTADO DO MARANHÃO</h4>
+            <h4>SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h4>
+            <h4>POLÍCIA MILITAR DO MARANHÃO</h4>
+            <h4>COMANDO DO POLICIAMENTO DO INTERIOR - CPI</h4>
+            <h4>COMANDO DO POLICIAMENTO DE ÁREA DO INTERIOR – CPA/I 04</h4>
+            <h4>11º BATALHÃO DE POLÍCIA MILITAR – 4ª CIA MATÕES</h4>
+            
+            <br>
+            <h1>LIVRO DIÁRIO</h1>
+            <br>
+        </div>
+    </div>
+    
+    <!-- Parte Diária -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>PARTE DIÁRIA</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Parte diária do
+                        <strong>
+                            {{ request.user.policial.get_patente_display }} {{ request.user.policial.numero_barra }}/{{ request.user.policial.barra }} {{ request.user.policial.nome_guerra }}
+                        </strong>
+                        , de serviço de 24 horas do dia 
+                        <strong>{{ data_anterior }}</strong> 
+                        para o dia 
+                        <strong>{{ data_hoje }}</strong>, 
+                        ao Sr. comandante da 4ª CIA/11º BPM 
+                        <strong>{{ comandante }}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 1. SERVIÇO INTERNO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>1. SERVIÇO INTERNO</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th colspan="4">PERMANÊNCIA</th>
+                                </tr>
+                                <tr>
+                                    <th>Policial na Permanência</th>
+                                    <th>Permutou com</th>
+                                    <th>Serviço</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-permanencia">
+                                <tr>
+                                    <td>
+                                        <select class="form-control" name="permanencia[]">
+                                            <option value="">Selecione o policial de serviço interno</option>
+                                            {% for policial in policiais %}
+                                            <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="permuta_permanencia[]">
+                                            <option value="">Selecione o policial</option>
+                                            {% for policial in policiais %}
+                                            <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="servico_permanencia[]">
+                                            <option value="">Selecione</option>
+                                            <option value="1o_GIRO">1º GIRO</option>
+                                            <option value="2o_GIRO">2º GIRO</option>
+                                            <option value="1o_QTU">1º QTU</option>
+                                            <option value="2o_QTU">2º QTU</option>
+                                            <option value="24HS">24HS</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-permanencia')">Adicionar Linha</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- . SERVIÇO EXTERNO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6>1.1. SERVIÇO EXTERNO</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabela-servico-externo">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th colspan="6">ESCALA DE SERVIÇO EXTERNO</th>
+                                </tr>
+                                <tr>
+                                    <th>Nome do Policial</th>
+                                    <th>Permuta</th>
+                                    <th>Turno da Permuta</th>
+                                    <th>VTR de Serviço</th>
+                                    <th>Função</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-externo">
+                                <tr>
+                                    <td>
+                                        <select class="form-control" name="policial_externo[]">
+                                            <option value="">Selecione o policial</option>
+                                            {% for policial in policiais %}
+                                            <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="permuta_externo[]">
+                                            <option value="">Selecione a permuta</option>
+                                            <option value="sem_permuta" selected>SEM PERMUTA</option>
+                                            {% for policial in policiais %}
+                                            <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="hora_externo[]">
+                                            <option value="">Selecione</option>
+                                            <option value="06H">06H</option>
+                                            <option value="1o_GIRO">1º GIRO</option>
+                                            <option value="2o_GIRO">2º GIRO</option>
+                                            <option value="1o_QTU">1º QTU</option>
+                                            <option value="2o_QTU">2º QTU</option>
+                                            <option value="24HS" selected>24HS</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="vtr_servico[]">
+                                            <option value="">Selecione a viatura</option>
+                                            {% for viatura in viaturas %}
+                                                <option value="{{ viatura.id }}">{{ viatura.prefixo }} - {{ viatura.modelo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="funcao_externo[]">
+                                            <option value="">Selecione a função</option>
+                                            <option value="cmt_da_vtr_mike">CMT DA VTR/MIKE</option>
+                                            <option value="motorista">MOTORISTA</option>
+                                            <option value="patrulheiro">PATRULHEIRO</option>
+                                            <option value="motociclista">MOTOCICLISTA</option>
+                                            <option value="atendente">APOIO POLICIAL</option>
+                                            <option value="outros">OUTROS</option>
+                                        </select>                                 
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-externo')">Adicionar Linha</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- REMANEJAMENTO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6>1.2. REMANEJAMENTO</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">REMANEJAMENTO</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="remanejamento_alteracao" id="remanejamento_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="remanejamento_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-remanejamento">
+                                <thead class="thead-light">
+                                    <tr><th colspan="4">DETALHAMENTO DO REMANEJAMENTO</th></tr>
+                                    <tr>
+                                        <th>Nome do Policial</th>
+                                        <th>Posto Escalado</th>
+                                        <th>Posto Remanejado</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-remanejamento">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="policial_remanejamento[]">
+                                                <option value="">Selecione o policial</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="posto_escalado[]">
+                                                <option value="">Selecione o posto</option>
+                                                <option value="sem_permuta">SEM PERMUTA</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="posto_remanejado[]">
+                                                <option value="">Selecione a função</option>
+                                                <option value="cmt_da_vtr_mike">CMT DA VTR/MIKE</option>
+                                                <option value="motorista">MOTORISTA</option>
+                                                <option value="patrulheiro">PATRULHEIRO</option>
+                                                <option value="motociclista">MOTOCICLISTA</option>
+                                                <option value="atendente">APOIO POLICIAL</option>
+                                                <option value="outros">OUTROS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-remanejamento')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- DISPENSAS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6>1.3. DISPENSAS</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">DISPENSAS</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="dispensa_alteracao" id="dispensa_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="dispensa_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-dispensas">
+                                <thead class="thead-light">
+                                    <tr><th colspan="5">DETALHAMENTO DAS DISPENSAS</th></tr>
+                                    <tr>
+                                        <th>Nome do PM</th>
+                                        <th>Turno / Hora da Dispensa</th>
+                                        <th>Motivo</th>
+                                        <th>Observação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-dispensas">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="policial_dispensa[]">
+                                                <option value="">Selecione o policial</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="turno_hora_dispensa[]">
+                                                <option value="">Selecione o turno/hora</option>
+                                                <option value="1o_GIRO">1º GIRO</option>
+                                                <option value="2o_GIRO">2º GIRO</option>
+                                                <option value="1o_QTU">1º QTU</option>
+                                                <option value="2o_QTU">2º QTU</option>
+                                                <option value="24HS">24HS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="motivo_dispensa[]">
+                                                <option value="">Selecione o motivo</option>
+                                                <option value="folga">FOLGA</option>
+                                                <option value="licenca_saude">LICENÇA SAÚDE</option>
+                                                <option value="luto">LUTO</option>
+                                                <option value="casamento">CASAMENTO</option>
+                                                <option value="treinamento">TREINAMENTO</option>
+                                                <option value="servico_admin">SERVIÇO ADMINISTRATIVO</option>
+                                                <option value="dispensado_cmd">DISPENSADO PELO CMD DA CIA</option>
+                                                <option value="arma_fogo">DISPENSADO POR ARMA DE FOGO</option>
+                                                <option value="reforco_policial">DISPENSADO POR REFORÇO POLICIAL</option>
+                                                <option value="outros">OUTROS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="observacao_dispensa[]" placeholder="Digite a observação...">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-dispensas')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FALTAS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-black text-white">
+                    <h6>1.4. FALTAS</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">FALTAS</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="falta_alteracao" id="falta_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="falta_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-faltas">
+                                <thead class="thead-light">
+                                    <tr><th colspan="5">DETALHAMENTO DAS FALTAS</th></tr>
+                                    <tr>
+                                        <th>Nome do PM</th>
+                                        <th>Turno / Hora da Falta</th>
+                                        <th>Motivo</th>
+                                        <th>Observação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-faltas">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="policial_falta[]">
+                                                <option value="">Selecione o policial</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="turno_hora_falta[]">
+                                                <option value="">Selecione o turno/hora</option>
+                                                <option value="1o_GIRO">1º GIRO</option>
+                                                <option value="2o_GIRO">2º GIRO</option>
+                                                <option value="1o_QTU">1º QTU</option>
+                                                <option value="2o_QTU">2º QTU</option>
+                                                <option value="24HS">24HS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="motivo_falta[]">
+                                                <option value="">Selecione o motivo</option>
+                                                <option value="folga">FOLGA</option>
+                                                <option value="licenca_saude">LICENÇA SAÚDE</option>
+                                                <option value="luto">LUTO</option>
+                                                <option value="casamento">CASAMENTO</option>
+                                                <option value="treinamento">TREINAMENTO</option>
+                                                <option value="servico_admin">SERVIÇO ADMINISTRATIVO</option>
+                                                <option value="dispensado_cmd">DISPENSADO PELO CMD DA CIA</option>
+                                                <option value="arma_fogo">DISPENSADO POR ARMA DE FOGO</option>
+                                                <option value="reforco_policial">DISPENSADO POR REFORÇO POLICIAL</option>
+                                                <option value="outros">OUTROS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="observacao_falta[]" placeholder="Digite a observação...">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-faltas')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- BAIXAS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6>1.5. BAIXA</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">BAIXA</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="baixa_alteracao" id="baixa_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="baixa_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-baixas">
+                                <thead class="thead-light">
+                                    <tr><th colspan="5">DETALHAMENTO DAS BAIXAS</th></tr>
+                                    <tr>
+                                        <th>Nome do PM</th>
+                                        <th>Turno / Baixa</th>
+                                        <th>Motivo</th>
+                                        <th>Observação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-baixas">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="policial_baixa[]">
+                                                <option value="">Selecione o policial</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="turno_hora_baixa[]">
+                                                <option value="">Selecione o turno/hora</option>
+                                                <option value="1o_GIRO">1º GIRO</option>
+                                                <option value="2o_GIRO">2º GIRO</option>
+                                                <option value="1o_QTU">1º QTU</option>
+                                                <option value="2o_QTU">2º QTU</option>
+                                                <option value="24HS">24HS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="motivo_baixa[]">
+                                                <option value="">Selecione o motivo</option>
+                                                <option value="folga">FOLGA</option>
+                                                <option value="licenca_saude">LICENÇA SAÚDE</option>
+                                                <option value="luto">LUTO</option>
+                                                <option value="casamento">CASAMENTO</option>
+                                                <option value="treinamento">TREINAMENTO</option>
+                                                <option value="servico_admin">SERVIÇO ADMINISTRATIVO</option>
+                                                <option value="dispensado_cmd">DISPENSADO PELO CMD DA CIA</option>
+                                                <option value="arma_fogo">DISPENSADO POR ARMA DE FOGO</option>
+                                                <option value="reforco_policial">DISPENSADO POR REFORÇO POLICIAL</option>
+                                                <option value="outros">OUTROS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="observacao_baixa[]" placeholder="Digite a observação...">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-baixas')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- LIBERAÇÕES -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6>1.6. LIBERAÇÕES</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">LIBERAÇÕES</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="liberacao_alteracao" id="liberacao_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="liberacao_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-liberacoes">
+                                <thead class="thead-light">
+                                    <tr><th colspan="5">DETALHAMENTO DAS LIBERAÇÕES</th></tr>
+                                    <tr>
+                                        <th>Nome do PM</th>
+                                        <th>Turno / Liberação</th>
+                                        <th>Motivo</th>
+                                        <th>Observação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-liberacoes">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="policial_liberacao[]">
+                                                <option value="">Selecione o policial</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="turno_hora_liberacao[]">
+                                                <option value="">Selecione o turno/hora</option>
+                                                <option value="1o_GIRO">1º GIRO</option>
+                                                <option value="2o_GIRO">2º GIRO</option>
+                                                <option value="1o_QTU">1º QTU</option>
+                                                <option value="2o_QTU">2º QTU</option>
+                                                <option value="24HS">24HS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="motivo_liberacao[]">
+                                                <option value="">Selecione o motivo</option>
+                                                <option value="folga">FOLGA</option>
+                                                <option value="licenca_saude">LICENÇA SAÚDE</option>
+                                                <option value="luto">LUTO</option>
+                                                <option value="casamento">CASAMENTO</option>
+                                                <option value="treinamento">TREINAMENTO</option>
+                                                <option value="servico_admin">SERVIÇO ADMINISTRATIVO</option>
+                                                <option value="dispensado_cmd">DISPENSADO PELO CMD DA CIA</option>
+                                                <option value="arma_fogo">DISPENSADO POR ARMA DE FOGO</option>
+                                                <option value="reforco_policial">DISPENSADO POR REFORÇO POLICIAL</option>
+                                                <option value="outros">OUTROS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="observacao_liberacao[]" placeholder="Digite a observação...">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-liberacoes')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ATRASOS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h6>1.7. ATRASO</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">ATRASO</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="atraso_alteracao" id="atraso_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="atraso_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-atrasos">
+                                <thead class="thead-light">
+                                    <tr><th colspan="3">DETALHAMENTO DOS ATRASOS</th></tr>
+                                    <tr>
+                                        <th>Nome do PM</th>
+                                        <th>Observação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-atrasos">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="policial_atraso[]">
+                                                <option value="">Selecione o policial</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="observacao_atraso[]" placeholder="Digite a observação...">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-atrasos')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIATURAS EM SERVIÇO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-black text-white">
+                    <h6>1.8. ALTERAÇÕES NA VTR</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">VIATURAS EM SERVIÇO</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="viatura_alteracao" id="viatura_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="viatura_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-viaturas">
+                                <thead class="thead-light">
+                                    <tr><th colspan="5">DETALHAMENTO DAS VIATURAS</th></tr>
+                                    <tr>
+                                        <th>Prefixo VTR</th>
+                                        <th>Turno/Hora</th>
+                                        <th>Motorista</th>
+                                        <th>Problema da VTR</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-viaturas">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control" name="vtr_servico[]">
+                                                <option value="">Selecione a viatura</option>
+                                                {% for viatura in viaturas %}
+                                                <option value="{{ viatura.id }}">{{ viatura.prefixo }} - {{ viatura.modelo }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="hora_vtr[]">
+                                                <option value="">Selecione</option>
+                                                <option value="1o_GIRO">1º GIRO</option>
+                                                <option value="2o_GIRO">2º GIRO</option>
+                                                <option value="1o_QTU">1º QTU</option>
+                                                <option value="2o_QTU">2º QTU</option>
+                                                <option value="24HS">24HS</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="motorista_vtr[]">
+                                                <option value="">Selecione o motorista</option>
+                                                {% for policial in policiais %}
+                                                <option value="{{ policial.id }}">{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}</option>
+                                                {% endfor %}
+                                            </select>                        
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="problema_vtr[]">
+                                                <option value="sem_problema">SEM PROBLEMA</option>
+                                                <optgroup label="Motor">
+                                                    <option value="motor_nao_liga">Motor não liga</option>
+                                                    <option value="motor_falhando">Motor falhando</option>
+                                                    <option value="motor_batendo">Motor batendo</option>
+                                                    <option value="motor_superaquecendo">Motor superaquecendo</option>
+                                                </optgroup>
+                                                <optgroup label="Sistema elétrico">
+                                                    <option value="bateria_descarregada">Bateria descarregada</option>
+                                                    <option value="sirene_sem_funcionar">Sirene sem funcionar</option>
+                                                    <option value="giroflex_sem_funcionar">Giroflex sem funcionar</option>
+                                                </optgroup>
+                                                <optgroup label="Pneus">
+                                                    <option value="pneu_furado">Pneu furado</option>
+                                                    <option value="pneu_murcho">Pneu murcho</option>
+                                                </optgroup>
+                                                <optgroup label="Outros">
+                                                    <option value="vazamento_nao_identificado">Vazamento não identificado</option>
+                                                    <option value="indisponivel_para_servico">Indisponível para serviço</option>
+                                                </optgroup>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-viaturas')">Adicionar Linha</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- BOLETIM DE OCORRÊNCIA -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-black text-white">
+                    <h6>1.9. BOLETIM DE OCORRÊNCIA</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">BOLETIM DE OCORRÊNCIA</th></tr>
+                            
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="boletim_ocorrencia_alteracao" id="boletim_ocorrencia_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="boletim_ocorrencia_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-boletim-ocorrencia">
+                                <thead class="thead-light">
+                                    <tr><th colspan="3">DETALHAMENTO DO BOLETIM DE OCORRÊNCIA</th></tr>
+                                    <tr>
+                                        <th>Nº do BO</th>
+                                        <th>Tipo Criminal</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-boletim-ocorrencia">
+                                    <tr>
+                                        <td><input type="text" class="form-control" name="bo_numero[]" placeholder="Digite o número do BO"></td>
+                                        <td><input type="text" class="form-control" name="bo_tipo_criminal[]" placeholder="Digite o tipo criminal"></td>
+                                        <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-boletim-ocorrencia')">Adicionar Linha</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- OCORRÊNCIA DE TRÂNSITO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-black text-white">
+                    <h6>1.10. OCORRÊNCIA DE TRÂNSITO</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr><th colspan="2">OCORRÊNCIA DE TRÂNSITO</th></tr>
+                            
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="ocorrencia_transito_alteracao" id="ocorrencia_transito_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div id="ocorrencia_transito_conteudo" style="display: none;">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered" id="tabela-ocorrencia-transito">
+                                <thead class="thead-light">
+                                    <tr><th colspan="7">DETALHAMENTO DA OCORRÊNCIA DE TRÂNSITO</th></tr>
+                                    <tr>
+                                        <th>AIT</th>
+                                        <th>TCACP</th>
+                                        <th>FRV</th>
+                                        <th>ARV</th>
+                                        <th>CNH</th>
+                                        <th>CRLV</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpo-tabela-ocorrencia-transito">
+                                    <tr>
+                                        <td><input type="text" class="form-control" name="ocorrencia_ait[]" placeholder="Nº AIT"></td>
+                                        <td><input type="text" class="form-control" name="ocorrencia_tcacp[]" placeholder="Nº TCACP"></td>
+                                        <td><input type="text" class="form-control" name="ocorrencia_frv[]" placeholder="Nº FRV"></td>
+                                        <td><input type="text" class="form-control" name="ocorrencia_arv[]" placeholder="Nº ARV"></td>
+                                        <td><input type="text" class="form-control" name="ocorrencia_cnh[]" placeholder="CNH"></td>
+                                        <td><input type="text" class="form-control" name="ocorrencia_crlv[]" placeholder="CRLV"></td>
+                                        <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-ocorrencia-transito')">Adicionar Linha</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<!-- 2. SEGUNDA PARTE - ENSINO E INSTRUÇÃO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>2. SEGUNDA PARTE - ENSINO E INSTRUÇÃO</h5>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- OCORRÊNCIA DE TRÂNSITO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-black text-white">
+                <h6>2.1. ENSINO</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="ensino_alteracao" id="ensino_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <div id="ensino_campo_observacoes" style="display: none;">
+                                        <textarea class="form-control" name="ensino_observacoes" rows="3" placeholder="Descreva as alterações..."></textarea>
+                                    </div>
+                                    <span id="ensino_texto_padrao">S/A</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2.2 INSTRUÇÃO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-black text-white">
+                <h6>2.2. INSTRUÇÃO</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="form-control" name="instrucao_alteracao" id="instrucao_alteracao">
+                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <div id="instrucao_campo_observacoes" style="display: none;">
+                                        <textarea class="form-control" name="instrucao_observacoes" rows="3" placeholder="Descreva as alterações..."></textarea>
+                                    </div>
+                                    <span id="instrucao_texto_padrao">S/A</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- TERCEIRA PARTE - ASSUNTOS GERAIS E ADMINISTRATIVOS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>3. TERCEIRA PARTE - ASSUNTOS GERAIS E ADMINISTRATIVOS</h5>
+                </div>
+                <div class="card-body">
+                        
+                    <!-- 3.2 KM E LITROS POR VIATURA -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-black text-white">
+                                    <h6>3.2. ABASTECIMENTO DAS VIATURAS</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" name="km_litros_alteracao" id="km_litros_alteracao">
+                                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div id="km_litros_conteudo" style="display: none;">
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-bordered">
+                                                <thead class="thead-light">
+                                                    <tr><th colspan="4">DETALHAMENTO DO ABASTECIMENTO</th></tr>
+                                                    <tr>
+                                                        <th>Viatura</th>
+                                                        <th>KM da Viatura</th>
+                                                        <th>Quantidade de Litros</th>
+                                                        <th>Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="corpo-tabela-km-litros">
+                                                    <tr>
+                                                        <td>
+                                                            <select class="form-control" name="viatura_km_litros[]">
+                                                                <option value="">Selecione a viatura</option>
+                                                                {% for viatura in viaturas %}
+                                                                <option value="{{ viatura.id }}">{{ viatura.prefixo }} - {{ viatura.modelo }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" name="km_viatura[]" placeholder="Digite a KM">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" name="quantidade_litros[]" placeholder="Digite a quantidade de litros">
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-km-litros')">Adicionar Linha</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 3.3 INSTALAÇÕES/MATERIAIS -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-black text-white">
+                                    <h6>3.3. INSTALAÇÕES/MATERIAIS</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr><th colspan="2">INSTALAÇÕES/MATERIAIS</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" name="instalacoes_alteracao" id="instalacoes_alteracao">
+                                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div id="instalacoes_conteudo" style="display: none;">
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-bordered">
+                                                <thead class="thead-light">
+                                                    <tr><th colspan="2">DETALHAMENTO INSTALAÇÕES/MATERIAIS</th></tr>
+                                                    <tr><th>Observações</th><th>Ações</th></tr>
+                                                </thead>
+                                                <tbody id="corpo-tabela-instalacoes">
+                                                    <tr>
+                                                        <td><input type="text" class="form-control" name="observacoes_instalacoes[]" placeholder="Digite as observações..."></td>
+                                                        <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-instalacoes')">Adicionar Linha</button></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 3.4 DOCUMENTAÇÃO RECEBIDA -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-black text-white">
+                                    <h6>3.4. DOCUMENTAÇÃO RECEBIDA</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr><th colspan="2">DOCUMENTAÇÃO RECEBIDA</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" name="documentacao_alteracao" id="documentacao_alteracao">
+                                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div id="documentacao_conteudo" style="display: none;">
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-bordered">
+                                                <thead class="thead-light">
+                                                    <tr><th colspan="3">DETALHAMENTO DOCUMENTAÇÃO RECEBIDA</th></tr>
+                                                    <tr><th>Documento</th><th>Observações</th><th>Ações</th></tr>
+                                                </thead>
+                                                <tbody id="corpo-tabela-documentacao">
+                                                    <tr>
+                                                        <td>
+                                                            <select class="form-control" name="documento_nome[]">
+                                                                <option value="">Selecione o documento</option>
+                                                                <optgroup label="Comunicações oficiais">
+                                                                    <option value="oficio">Ofício</option>
+                                                                    <option value="memorando">Memorando</option>
+                                                                    <option value="circular">Circular</option>
+                                                                    <option value="boletim_interno">Boletim interno</option>
+                                                                </optgroup>
+                                                                <optgroup label="Recursos humanos">
+                                                                    <option value="requerimento">Requerimento</option>
+                                                                    <option value="atestado_medico">Atestado médico</option>
+                                                                    <option value="escala_servico">Escala de serviço</option>
+                                                                </optgroup>
+                                                                <optgroup label="Operacional">
+                                                                    <option value="boletim_ocorrencia">Boletim de ocorrência</option>
+                                                                    <option value="parte_diaria">Parte diária</option>
+                                                                </optgroup>
+                                                                <optgroup label="Outros">
+                                                                    <option value="outro">Outro</option>
+                                                                </optgroup>
+                                                            </select>
+                                                        </td>
+                                                        <td><input type="text" class="form-control" name="observacoes_documentacao[]" placeholder="Digite as observações...">
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-documentacao')">Adicionar Linha</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 3.5 ASSUNTOS GERAIS -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-black text-white">
+                                    <h6>3.5. ASSUNTOS GERAIS</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr><th colspan="2">ASSUNTOS GERAIS</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" name="assuntos_gerais_alteracao" id="assuntos_gerais_alteracao">
+                                                        <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                        <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div id="assuntos_gerais_conteudo" style="display: none;">
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-bordered">
+                                                <thead class="thead-light">
+                                                    <tr><th colspan="2">DETALHAMENTO ASSUNTOS GERAIS</th></tr>
+                                                    <tr><th>Assunto</th><th>Ações</th></tr>
+                                                </thead>
+                                                <tbody id="corpo-tabela-assuntos-gerais">
+                                                    <tr>
+                                                        <td><input type="text" class="form-control" name="assunto_texto[]" placeholder="Digite o assunto"></td>
+                                                        <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-assuntos-gerais')">Adicionar Linha</button></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<!-- 5. QUARTA PARTE - JUSTIÇA E DISCIPLINA -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>4. QUARTA PARTE - JUSTIÇA E DISCIPLINA</h5>
+            </div>
+            <div class="card-body">
+
+                <!-- 4.1 CRIME COMUM -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-black text-white">
+                                <h6>4.1. JUSTIÇA - CRIME COMUM</h6>
+                            </div>
+                            <div class="card-body">
+
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr><th colspan="2">CRIME COMUM</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="form-control" name="crime_comum_alteracao" id="crime_comum_alteracao">
+                                                    <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                    <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div id="crime_comum_conteudo" style="display: none;">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr><th colspan="2">DETALHAMENTO - CRIME COMUM</th></tr>
+                                                <tr><th>Observações</th><th>Ações</th></tr>
+                                            </thead>
+                                            <tbody id="corpo-tabela-crime-comum">
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="observacoes_crime_comum[]"></td>
+                                                    <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-crime-comum')">Adicionar Linha</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4.1 CRIME MILITAR -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-black text-white">
+                                <h6>4.2. JUSTIÇA - CRIME MILITAR</h6>
+                            </div>
+                            <div class="card-body">
+
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr><th colspan="2">CRIME MILITAR</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="form-control" name="crime_militar_alteracao" id="crime_militar_alteracao">
+                                                    <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                    <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div id="crime_militar_conteudo" style="display: none;">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr><th colspan="2">DETALHAMENTO - CRIME MILITAR</th></tr>
+                                                <tr><th>Observações</th><th>Ações</th></tr>
+                                            </thead>
+                                            <tbody id="corpo-tabela-crime-militar">
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="observacoes_crime_militar[]"></td>
+                                                    <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-crime-militar')">Adicionar Linha</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4.2 ALTERAÇÃO DE OFICIAL -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-black text-white">
+                                <h6>4.3. DISCIPLINA - ALTERAÇÕES DE OFICIAL</h6>
+                            </div>
+                            <div class="card-body">
+
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr><th colspan="2">ALTERAÇÕES DE OFICIAL</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="form-control" name="alteracao_oficial_alteracao" id="alteracao_oficial_alteracao">
+                                                    <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                    <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div id="alteracao_oficial_conteudo" style="display: none;">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr><th colspan="2">DETALHAMENTO - ALTERAÇÕES DE OFICIAL</th></tr>
+                                                <tr><th>Observações</th><th>Ações</th></tr>
+                                            </thead>
+                                            <tbody id="corpo-tabela-alteracao-oficial">
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="observacoes_alteracao_oficial[]"></td>
+                                                    <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-alteracao-oficial')">Adicionar Linha</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4.2 ALTERAÇÃO DE PRAÇA -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-black text-white">
+                                <h6>4.4. DISCIPLINA - ALTERAÇÃO DE PRAÇA</h6>
+                            </div>
+                            <div class="card-body">
+
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr><th colspan="2">ALTERAÇÃO DE PRAÇA</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="form-control" name="alteracao_praca_alteracao" id="alteracao_praca_alteracao">
+                                                    <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                    <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div id="alteracao_praca_conteudo" style="display: none;">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr><th colspan="2">DETALHAMENTO - ALTERAÇÃO DE PRAÇA</th></tr>
+                                                <tr><th>Observações</th><th>Ações</th></tr>
+                                            </thead>
+                                            <tbody id="corpo-tabela-alteracao-praca">
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="observacoes_alteracao_praca[]"></td>
+                                                    <td><button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-alteracao-praca')">Adicionar Linha</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 7. ALTERAÇÕES DO SERVIÇO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>5. ALTERAÇÕES DO SERVIÇO</h5>
+            </div>
+            <div class="card-body">
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-black text-white">
+                                <h6>5.1. ALTERAÇÕES DO SERVIÇO</h6>
+                            </div>
+                            <div class="card-body">
+
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr><th colspan="2">ALTERAÇÕES DO SERVIÇO</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="form-control" name="alteracoes_servico_alteracao" id="alteracoes_servico_alteracao">
+                                                    <option value="sem_alteracao">SEM ALTERAÇÃO</option>
+                                                    <option value="com_alteracao">COM ALTERAÇÃO</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div id="alteracoes_servico_conteudo" style="display: none;">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr><th colspan="3">DETALHAMENTO DAS ALTERAÇÕES</th></tr>
+                                                <tr>
+
+                                                    <th>Observações Adicionais</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="corpo-tabela-alteracoes-servico">
+                                                <tr>
+                                                    <td>
+                                                        <textarea class="form-control" name="obs_alteracoes_servico[]" rows="2" placeholder="Detalhes adicionais..."></textarea>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-success" onclick="adicionarLinhaGenerica('corpo-tabela-alteracoes-servico')">
+                                                            Adicionar Linha
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- POLICIAL SUBSTITUTO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>6. POLICIAL SUBSTITUTO</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="policial_substituto">Selecione o policial substituto:</label>
+                    <select class="form-control" name="policial_substituto" id="policial_substituto">
+                        <option value="">NENHUM - PERMANEÇO NO SERVIÇO</option>
+                        {% for policial in policiais %}
+                            <option value="{{ policial.id }}" data-nome="{{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}">
+                                {{ policial.patente }} {{ policial.numero_barra }}/{{ policial.barra }} {{ policial.nome_guerra }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">
+                        Caso não haja substituto, deixe a opção "NENHUM - PERMANEÇO NO SERVIÇO" selecionada.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PASSAGEM DE SERVIÇO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5>7. PASSAGEM DE SERVIÇO</h5>
+            </div>
+            <div class="card-body">
+                <div id="texto_passagem_servico">
+                    <p>
+                        PERMANEÇO NO SERVIÇO DE 24HS, RATIFICANDO TODAS AS ORDENS RECEBIDAS E MANTENDO SOB MINHA GUARDA E RESPONSABILIDADE TODO O MATERIAL DE CARGA QUE ME FOI CONFIADO, BEM COMO OS DOCUMENTOS E EQUIPAMENTOS PERTINENTES À FUNÇÃO, DANDO CONTINUIDADE ÀS ATIVIDADES EM CURSO.
+                    </p>
+                </div>
+                <p class="text-center">
+                    4ª CIA/11º BPM em Matões-MA, {{ data_extenso }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ASSINATURAS -->
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Comandante da GU</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if policial_logado and policial_logado.assinatura %}
+                            <img src="{{ policial_logado.assinatura.url }}" 
+                                 alt="Assinatura" 
+                                 style="max-width: 250px; max-height: 100px; border: 1px solid #ccc; padding: 5px;">
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Assinatura não cadastrada
+                            </div>
+                        {% endif %}
+                        <p class="mt-3">
+                            <strong>
+                                {% if policial_logado %}
+                                    {{ policial_logado.get_patente_display }} {{ policial_logado.nome_guerra }}
+                                {% else %}
+                                    {{ usuario_logado.get_full_name|default:usuario_logado.username }}
+                                {% endif %}
+                            </strong><br>
+                            CMD DA GU
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5>Comandante da CIA</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if comandante and comandante.assinatura %}
+                            <img src="{{ comandante.assinatura.url }}" 
+                                 alt="Assinatura do Comandante" 
+                                 style="max-width: 250px; max-height: 100px; border: 1px solid #ccc; padding: 5px;">
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Assinatura não cadastrada
+                            </div>
+                        {% endif %}
+                        <p class="mt-3">
+                            <strong>{{ comandante.get_patente_display }} {{ comandante.nome_guerra|default:comandante.nome }}</strong><br>
+                            CMT DA 4ª CIA/11º BPM
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botões de ação -->
+<div class="row mt-4 mb-4">
+    <div class="col-12 text-center">
+        <button type="button" class="btn btn-success" id="btn-gerar-relatorio">
+            <i class="fas fa-file-alt"></i> GERAR RELATÓRIO
+        </button>
+
+        <button type="button" class="btn btn-info" id="btn-listar-relatorios">
+            <i class="fas fa-list"></i> LISTAR RELATÓRIOS
+        </button>
+
+        <button type="button" class="btn btn-primary" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </button>
+    </div>
+</div>
+
+<script>
+
+    
+
+
+
+
+// Função para coletar todas as alterações
+function getAlteracoesTexto() {
+    var linhas = document.querySelectorAll('#corpo-tabela-alteracoes-servico tr');
+    if (!linhas.length) return '';
+
+    var textoAlteracoes = [];
+
+    linhas.forEach(function(linha, index) {
+        var obsTextarea = linha.querySelector('textarea[name="obs_alteracoes_servico[]"]');
+        var obs = obsTextarea ? obsTextarea.value.trim() : '';
+
+        if (obs) {
+            textoAlteracoes.push((index + 1) + 'º - ' + obs);
+        }
+    });
+
+    if (textoAlteracoes.length > 0) {
+        return '<br><br><strong>ALTERAÇÕES REGISTRADAS:</strong><br>• ' + textoAlteracoes.join('<br>• ');
+    }
+
+    return '';
+}
+
+// Função para atualizar texto da passagem de serviço
+function atualizarTextoPassagem() {
+    var selectSubstituto = document.getElementById('policial_substituto');
+    var selectAlteracoes = document.getElementById('alteracoes_servico_alteracao');
+    var textoDiv = document.getElementById('texto_passagem_servico');
+
+    if (!selectSubstituto || !selectAlteracoes || !textoDiv) return;
+
+    var selectedOption = selectSubstituto.options[selectSubstituto.selectedIndex];
+    var substitutoNome = selectedOption ? selectedOption.getAttribute('data-nome') : '';
+    var temSubstituto = selectSubstituto.value !== "";
+    var temAlteracoes = selectAlteracoes.value === 'com_alteracao';
+
+    var alteracoesTexto = temAlteracoes ? getAlteracoesTexto() : '';
+
+    if (temSubstituto) {
+        textoDiv.innerHTML = `
+            <p>
+                REALIZEI A PASSAGEM DE SERVIÇO AO MEU SUBSTITUTO LEGAL, O(A) <strong>${substitutoNome}</strong>,
+                TRANSMITINDO-LHE TODAS AS ORDENS EM VIGOR, BEM COMO A TOTALIDADE DO MATERIAL
+                SOB MINHA RESPONSABILIDADE, DEVIDAMENTE CONFERIDO
+                ${temAlteracoes ? '' : 'E EM PERFEITAS CONDIÇÕES DE USO'},
+                <strong>${temAlteracoes ? 'HAVENDO ALTERAÇÕES REGISTRADAS' : 'NÃO HAVENDO ALTERAÇÕES RELEVANTES A REGISTRAR'}</strong>.
+                ${alteracoesTexto}
+            </p>
+        `;
+    } else {
+        textoDiv.innerHTML = `
+            <p>
+                PERMANEÇO NO SERVIÇO DE 24 HORAS, RATIFICANDO TODAS AS ORDENS RECEBIDAS,
+                MANTENDO SOB MINHA GUARDA E RESPONSABILIDADE TODO O MATERIAL DE CARGA QUE ME FOI
+                CONFIADO, ASSIM COMO OS DOCUMENTOS E EQUIPAMENTOS INERENTES À FUNÇÃO,
+                <strong>${temAlteracoes ? 'DANDO CONTINUIDADE ÀS ATIVIDADES EM ANDAMENTO, COM ALTERAÇÕES DIGNAS DE REGISTRO' : 'DANDO CONTINUIDADE ÀS ATIVIDADES EM ANDAMENTO, SEM ALTERAÇÕES DIGNAS DE REGISTRO'}</strong>.
+                ${alteracoesTexto}
+            </p>
+        `;
+    }
+}
+
+
+
+
+
+
+
+
+
+// Função para atualizar texto da passagem de serviço
+function atualizarTextoPassagem() {
+    var selectSubstituto = document.getElementById('policial_substituto');
+    var selectAlteracoes = document.getElementById('alteracoes_servico_alteracao');
+    
+    if (!selectSubstituto || !selectAlteracoes) return;
+    
+    var selectedOption = selectSubstituto.options[selectSubstituto.selectedIndex];
+    var substitutoNome = selectedOption.getAttribute('data-nome');
+    var textoDiv = document.getElementById('texto_passagem_servico');
+    if (!textoDiv) return;
+    
+    var temSubstituto = selectSubstituto.value && selectSubstituto.value !== "";
+    var temAlteracoes = selectAlteracoes.value === 'com_alteracao';
+    
+    var alteracoesTexto = '';
+    if (temAlteracoes) {
+        alteracoesTexto = getAlteracoesTexto();
+    }
+    
+    if (temSubstituto) {
+        if (temAlteracoes && alteracoesTexto) {
+            textoDiv.innerHTML = `
+<p>
+REALIZEI A PASSAGEM DE SERVIÇO AO MEU SUBSTITUTO LEGAL, O(A) <strong>${substitutoNome}</strong>, 
+TRANSMITINDO-LHE TODAS AS ORDENS EM VIGOR, BEM COMO A TOTALIDADE DO MATERIAL 
+SOB MINHA RESPONSABILIDADE, DEVIDAMENTE CONFERIDO.
+
+${alteracoesTexto}
+</p>
+`;
+        } else {
+            textoDiv.innerHTML = `
+<p>
+REALIZEI A PASSAGEM DE SERVIÇO AO MEU SUBSTITUTO LEGAL, O(A) <strong>${substitutoNome}</strong>, 
+TRANSMITINDO-LHE TODAS AS ORDENS EM VIGOR, BEM COMO A TOTALIDADE DO MATERIAL 
+SOB MINHA RESPONSABILIDADE, DEVIDAMENTE CONFERIDO E EM PERFEITAS CONDIÇÕES DE USO.
+${alteracoesTexto}
+</p>
+`;
+        }
+    } else {
+        if (temAlteracoes && alteracoesTexto) {
+            textoDiv.innerHTML = `
+<p>
+PERMANEÇO NO SERVIÇO DE 24 HORAS, RATIFICANDO TODAS AS ORDENS RECEBIDAS, 
+MANTENDO SOB MINHA GUARDA E RESPONSABILIDADE TODO O MATERIAL DE CARGA QUE ME FOI 
+CONFIADO, ASSIM COMO OS DOCUMENTOS E EQUIPAMENTOS INERENTES À FUNÇÃO, 
+<strong>DANDO CONTINUIDADE ÀS ATIVIDADES EM ANDAMENTO, COM ALTERAÇÕES DIGNAS DE REGISTRO</strong>.
+${alteracoesTexto}
+</p>
+`;
+        } else {
+            textoDiv.innerHTML = `
+<p>
+PERMANEÇO NO SERVIÇO DE 24 HORAS, RATIFICANDO TODAS AS ORDENS RECEBIDAS, 
+MANTENDO SOB MINHA GUARDA E RESPONSABILIDADE TODO O MATERIAL DE CARGA QUE ME FOI 
+CONFIADO, ASSIM COMO OS DOCUMENTOS E EQUIPAMENTOS INERENTES À FUNÇÃO, 
+<strong>DANDO CONTINUIDADE ÀS ATIVIDADES EM ANDAMENTO.</strong>.
+${alteracoesTexto}
+</p>
+`;
+        }
+    }
+}
+
+// Função genérica para adicionar linha em qualquer tabela
+function adicionarLinhaGenerica(tbodyId) {
+    var tabelaBody = document.getElementById(tbodyId);
+    if (!tabelaBody) return;
+    
+    var primeiraLinha = tabelaBody.querySelector('tr');
+    if (!primeiraLinha) return;
+    
+    var novaLinha = primeiraLinha.cloneNode(true);
+    
+    var campos = novaLinha.querySelectorAll('select, input, textarea');
+    campos.forEach(function(campo) {
+        if (campo.tagName === 'SELECT') {
+            campo.selectedIndex = 0;
+        } else if (campo.type === 'checkbox' || campo.type === 'radio') {
+            campo.checked = false;
+        } else {
+            campo.value = '';
+        }
+    });
+    
+    var ultimaCelula = novaLinha.querySelector('td:last-child');
+    if (ultimaCelula) {
+        var botaoRemover = document.createElement('button');
+        botaoRemover.type = 'button';
+        botaoRemover.className = 'btn btn-danger btn-sm';
+        botaoRemover.innerHTML = 'Remover';
+        botaoRemover.onclick = function() {
+            this.closest('tr').remove();
+            atualizarTextoPassagem();
+        };
+        ultimaCelula.innerHTML = '';
+        ultimaCelula.appendChild(botaoRemover);
+    }
+    
+    tabelaBody.appendChild(novaLinha);
+}
+
+// Função para controlar exibição de conteúdo com C/A ou S/A
+function controlarAlteracao(selectId, conteudoId) {
+    var select = document.getElementById(selectId);
+    var conteudo = document.getElementById(conteudoId);
+    if (!select || !conteudo) return;
+    
+    function atualizar() {
+        conteudo.style.display = select.value === 'com_alteracao' ? 'block' : 'none';
+        atualizarTextoPassagem();
+    }
+    
+    select.addEventListener('change', atualizar);
+    atualizar();
+}
+
+// Função para controlar campo de observações com texto padrão
+function controlarCampoObservacao(selectId, campoId, textoId) {
+    var select = document.getElementById(selectId);
+    var campo = document.getElementById(campoId);
+    var texto = document.getElementById(textoId);
+    if (!select || !campo || !texto) return;
+    
+    function atualizar() {
+        if (select.value === 'com_alteracao') {
+            campo.style.display = 'block';
+            texto.style.display = 'none';
+        } else {
+            campo.style.display = 'none';
+            texto.style.display = 'inline';
+        }
+    }
+    
+    select.addEventListener('change', atualizar);
+    atualizar();
+}
+
+// Inicialização quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    // Controles de alteração para cada seção
+    controlarAlteracao('alteracoes_servico_alteracao', 'alteracoes_servico_conteudo');
+    controlarAlteracao('remanejamento_alteracao', 'remanejamento_conteudo');
+    controlarAlteracao('dispensa_alteracao', 'dispensa_conteudo');
+    controlarAlteracao('falta_alteracao', 'falta_conteudo');
+    controlarAlteracao('baixa_alteracao', 'baixa_conteudo');
+    controlarAlteracao('liberacao_alteracao', 'liberacao_conteudo');
+    controlarAlteracao('atraso_alteracao', 'atraso_conteudo');
+    controlarAlteracao('viatura_alteracao', 'viatura_conteudo');
+    controlarAlteracao('boletim_ocorrencia_alteracao', 'boletim_ocorrencia_conteudo');
+    controlarAlteracao('ocorrencia_transito_alteracao', 'ocorrencia_transito_conteudo');
+    controlarAlteracao('abastecimento_alteracao', 'abastecimento_conteudo');
+    controlarAlteracao('km_litros_alteracao', 'km_litros_conteudo');
+    controlarAlteracao('instalacoes_alteracao', 'instalacoes_conteudo');
+    controlarAlteracao('documentacao_alteracao', 'documentacao_conteudo');
+    controlarAlteracao('assuntos_gerais_alteracao', 'assuntos_gerais_conteudo');
+    controlarAlteracao('crime_comum_alteracao', 'crime_comum_conteudo');
+    controlarAlteracao('crime_militar_alteracao', 'crime_militar_conteudo');
+    controlarAlteracao('alteracao_oficial_alteracao', 'alteracao_oficial_conteudo');
+    controlarAlteracao('alteracao_praca_alteracao', 'alteracao_praca_conteudo');
+    
+    // Controles para ensino e instrução
+    controlarCampoObservacao('ensino_alteracao', 'ensino_campo_observacoes', 'ensino_texto_padrao');
+    controlarCampoObservacao('instrucao_alteracao', 'instrucao_campo_observacoes', 'instrucao_texto_padrao');
+    
+    // Passagem de serviço
+    var selectSubstituto = document.getElementById('policial_substituto');
+    var selectAlteracoesServico = document.getElementById('alteracoes_servico_alteracao');
+    
+    if (selectSubstituto) {
+        selectSubstituto.addEventListener('change', atualizarTextoPassagem);
+    }
+    if (selectAlteracoesServico) {
+        selectAlteracoesServico.addEventListener('change', atualizarTextoPassagem);
+    }
+    
+    // Adicionar listeners para inputs da tabela de alterações
+    function adicionarListenersAlteracoes() {
+        var inputs = document.querySelectorAll('#corpo-tabela-alteracoes-servico input, #corpo-tabela-alteracoes-servico textarea');
+        inputs.forEach(function(input) {
+            input.removeEventListener('input', atualizarTextoPassagem);
+            input.addEventListener('input', atualizarTextoPassagem);
+        });
+    }
+    
+    adicionarListenersAlteracoes();
+    
+    // Observador para novas linhas adicionadas
+    var observer = new MutationObserver(function() {
+        adicionarListenersAlteracoes();
+        atualizarTextoPassagem();
+    });
+    
+    var tabelaAlteracoes = document.getElementById('corpo-tabela-alteracoes-servico');
+    if (tabelaAlteracoes) {
+        observer.observe(tabelaAlteracoes, { childList: true, subtree: true });
+    }
+    
+    atualizarTextoPassagem();
+});
+function obterCSRFToken() {
+    const input = document.querySelector('[name=csrfmiddlewaretoken]');
+    return input ? input.value : '';
+}
+
+function obterDataHojeISO() {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+}
+
+function coletarTextoPassagem() {
+    const div = document.getElementById('texto_passagem_servico');
+    return div ? div.innerText.trim() : '';
+}
+
+async function gerarRelatorio() {
+    const form = document.getElementById('form-livro-diario');
+    const botao = document.getElementById('btn-gerar-relatorio');
+
+    if (!form) {
+        alert('Formulário não encontrado.');
+        return;
+    }
+
+    const formData = new FormData(form);
+
+    // campos extras exigidos pela view
+    formData.set('texto_passagem', coletarTextoPassagem());
+    formData.set('data_escala', obterDataHojeISO());
+
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GERANDO...';
+
+    try {
+        // MUDANÇA AQUI: usar a URL 'gerar_relatorio' em vez de 'salvar_relatorio'
+        const response = await fetch("{% url 'livro_diario:gerar_relatorio' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': obterCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            alert('Relatório gerado com sucesso!');
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Erro ao gerar relatório: ' + (data.message || 'erro desconhecido'));
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Erro de comunicação ao gerar o relatório.');
+    } finally {
+        botao.disabled = false;
+        botao.innerHTML = '<i class="fas fa-file-alt"></i> GERAR RELATÓRIO';
+    }
+}
+
+function listarRelatorios() {
+    window.location.href = "{% url 'livro_diario:listar_relatorios' %}";
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const btnGerar = document.getElementById('btn-gerar-relatorio');
+    const btnListar = document.getElementById('btn-listar-relatorios');
+
+    if (btnGerar) {
+        btnGerar.addEventListener('click', gerarRelatorio);
+    }
+
+    if (btnListar) {
+        btnListar.addEventListener('click', listarRelatorios);
+    }
+});
+</script>
+
+<style>
+@media print {
+    .btn {
+        display: none !important;
+    }
+    .card-header {
+        background-color: #f0f0f0 !important;
+        color: black !important;
+    }
+    .table {
+        page-break-inside: avoid;
+    }
+    .alert {
+        border: 1px solid #ccc;
+    }
+}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</form>
+{% endblock %}

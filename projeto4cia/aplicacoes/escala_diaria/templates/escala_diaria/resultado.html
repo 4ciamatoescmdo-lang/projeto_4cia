@@ -1,0 +1,157 @@
+<!-- aplicacoes/escala_diaria/templates/escala_diaria/resultado.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Escala Gerada{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-box {
+        background-color: #f8f9fa;
+        border: 2px solid #28a745;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin: 2rem 0;
+        font-family: 'Courier New', monospace;
+        white-space: pre-wrap;
+        font-size: 14px;
+        line-height: 1.6;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .btn-whatsapp {
+        background-color: #25D366;
+        border-color: #25D366;
+        color: white;
+    }
+    
+    .btn-whatsapp:hover {
+        background-color: #128C7E;
+        border-color: #128C7E;
+        color: white;
+    }
+    
+    .info-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #fff;
+    }
+    
+    .info-title {
+        color: #0d6efd;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>✅ Escala Gerada com Sucesso!</h1>
+            <p class="lead">Escala do dia {{ escala.data_escala|date:"d/m/Y" }}</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Resumo da Escala -->
+        <div class="col-md-4">
+            <div class="info-card">
+                <h4 class="info-title">📋 Resumo</h4>
+                <ul class="list-unstyled">
+                    <li><strong>Permanência:</strong> {{ permanencia|default:"Não informado" }}</li>
+                    <li><strong>Serviço Externo:</strong> {{ policiais_externos|length }} policial(is)</li>
+                    <li><strong>Permutas:</strong> {{ permutas|length }}</li>
+                    <li><strong>Dispensas:</strong> {{ dispensas|length }}</li>
+                </ul>
+            </div>
+            
+            {% if policiais_externos %}
+            <div class="info-card">
+                <h4 class="info-title">🚓 Serviço Externo</h4>
+                {% for pe in policiais_externos %}
+                <div class="mb-2">
+                    <strong>{{ pe.policial }}</strong><br>
+                    <small>VTR: {{ pe.viatura.prefixo }} - {{ pe.get_funcao_display }}</small>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if permutas %}
+            <div class="info-card">
+                <h4 class="info-title">🔄 Permutas</h4>
+                {% for p in permutas %}
+                <div class="mb-2">
+                    {{ p.policial_a }} x {{ p.policial_b }}<br>
+                    <small>Tipo: {{ p.get_tipo_display }}</small>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if dispensas %}
+            <div class="info-card">
+                <h4 class="info-title">⚠️ Dispensas</h4>
+                {% for d in dispensas %}
+                <div class="mb-2">
+                    {{ d.policial }}<br>
+                    <small>{{ d.get_motivo_display }} - {{ d.get_tipo_display }}</small>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Texto da Escala -->
+        <div class="col-md-8">
+            <div class="info-card">
+                <h4 class="info-title">📄 Texto da Escala</h4>
+                <div class="result-box" id="textoEscala">
+                    {{ texto_gerado }}
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-success btn-lg w-100" onclick="copiarTexto()">
+                            <i class="fas fa-copy"></i> Copiar Texto
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="https://wa.me/?text={{ texto_gerado|urlencode }}" 
+                           target="_blank" 
+                           class="btn btn-whatsapp btn-lg w-100">
+                            <i class="fab fa-whatsapp"></i> Abrir no WhatsApp
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <a href="{% url 'escala_diaria:nova_escala' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-plus"></i> Nova Escala
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copiarTexto() {
+        const texto = document.getElementById('textoEscala').innerText;
+        navigator.clipboard.writeText(texto).then(function() {
+            alert('✅ Texto copiado para a área de transferência!');
+        }).catch(function(err) {
+            alert('❌ Erro ao copiar texto. Tente novamente.');
+        });
+    }
+</script>
+{% endblock %}

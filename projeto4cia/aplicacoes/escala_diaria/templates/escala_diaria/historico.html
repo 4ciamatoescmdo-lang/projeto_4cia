@@ -1,0 +1,72 @@
+<!-- aplicacoes/escala_diaria/templates/escala_diaria/historico.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Histórico de Escalas{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>📚 Histórico de Escalas</h1>
+            <a href="{% url 'escala_diaria:nova_escala' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nova Escala
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Escalas Geradas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data da Escala</th>
+                                    <th>Data de Criação</th>
+                                    <th>Criado por</th>
+                                    <th>Permanência</th>
+                                    <th>Serv. Externo</th>
+                                    <th>Permutas</th>
+                                    <th>Dispensas</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for escala in escalas %}
+                                <tr>
+                                    <td>{{ escala.data_escala|date:"d/m/Y" }}</td>
+                                    <td>{{ escala.data_criacao|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ escala.criado_por.get_full_name|default:escala.criado_por.username }}</td>
+                                    <td>{{ escala.permanencia|default:"-" }}</td>
+                                    <td>{{ escala.policiais_externos.count }}</td>
+                                    <td>{{ escala.permutas.count }}</td>
+                                    <td>{{ escala.dispensas.count }}</td>
+                                    <td>
+                                        <a href="{% url 'escala_diaria:visualizar' escala.id %}" 
+                                           class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        Nenhuma escala gerada ainda.
+                                        <a href="{% url 'escala_diaria:nova_escala' %}">Gerar primeira escala</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

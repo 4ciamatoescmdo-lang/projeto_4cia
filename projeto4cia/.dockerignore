@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+
+# Django
+db.sqlite3
+*.log
+staticfiles/
+media/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.dockerignore
+
+# Outros
+*.md
+*.pyc
+*.pyo
+*.pyd

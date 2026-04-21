@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Armamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-shield-plus me-2"></i>Detalhes do Armamento</h1>
+        <div>
+            <a href="{% url 'cadastro_armamentos:armamento_update' armamento.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            <a href="{% url 'cadastro_armamentos:armamento_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>{{ armamento.get_tipo_display }} {{ armamento.marca }} {{ armamento.modelo }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Nº Série:</th>
+                            <td>{{ armamento.numero_serie }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tipo:</th>
+                            <td>{{ armamento.get_tipo_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Marca:</th>
+                            <td>{{ armamento.marca }}</td>
+                        </tr>
+                        <tr>
+                            <th>Modelo:</th>
+                            <td>{{ armamento.modelo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Calibre:</th>
+                            <td>{{ armamento.calibre }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Patrimônio:</th>
+                            <td>{{ armamento.patrimonio|default:'-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Registro:</th>
+                            <td>{{ armamento.registro|default:'-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Capacidade:</th>
+                            <td>{{ armamento.capacidade }} tiros</td>
+                        </tr>
+                        <tr>
+                            <th>Cano:</th>
+                            <td>{{ armamento.comprimento_cano|default:'-' }} cm</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if armamento.status == 'DISPONIVEL' %}
+                                    <span class="badge bg-success">Disponível</span>
+                                {% elif armamento.status == 'EM_USO' %}
+                                    <span class="badge bg-warning">Em Uso</span>
+                                {% elif armamento.status == 'MANUTENCAO' %}
+                                    <span class="badge bg-danger">Manutenção</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Baixado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if armamento.observacoes %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>Observações</h6>
+                        </div>
+                        <div class="card-body">
+                            {{ armamento.observacoes|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

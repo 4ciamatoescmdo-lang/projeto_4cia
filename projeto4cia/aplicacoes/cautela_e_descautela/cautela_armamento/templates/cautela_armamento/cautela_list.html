@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Cautelas de Armamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-shield-plus me-2"></i>Cautelas de Armamento</h1>
+        <a href="{% url 'cautela_armamento:cautela_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nova Cautela
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="ATIVA" {% if request.GET.status == 'ATIVA' %}selected{% endif %}>Ativas</option>
+                        <option value="DEVOLVIDA" {% if request.GET.status == 'DEVOLVIDA' %}selected{% endif %}>Devolvidas</option>
+                        <option value="PARCIAL" {% if request.GET.status == 'PARCIAL' %}selected{% endif %}>Devolução Parcial</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Armeiro (Cautela)</label>
+                    <select name="armeiro" class="form-select">
+                        <option value="">Todos</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if request.GET.armeiro == user.id|stringformat:"s" %}selected{% endif %}>
+                            {{ user.get_full_name|default:user.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Armeiro (Devolução)</label>  <!-- NOVO FILTRO -->
+                    <select name="devolvido_por" class="form-select">
+                        <option value="">Todos</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if request.GET.devolvido_por == user.id|stringformat:"s" %}selected{% endif %}>
+                            {{ user.get_full_name|default:user.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-filter me-2"></i>Filtrar
+                    </button>
+                    <a href="{% url 'cautela_armamento:cautela_list' %}" class="btn btn-outline-secondary ms-2">
+                        <i class="bi bi-eraser me-2"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Data</th>
+                            <th>Policial</th>
+                            <th>Armeiro (Cautela)</th>
+                            <th>Armeiro (Devolução)</th>  <!-- NOVA COLUNA -->
+                            <th>Previsão Devolução</th>
+                            <th>Itens</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+<tbody>
+    {% for cautela in cautelas %}
+    <tr>
+        <td><strong>#{{ cautela.id }}</strong></td>
+        <td>{{ cautela.data_cautela|date:"d/m/Y H:i" }}</td>
+        <td>
+            {{ cautela.policial.nome_guerra }}<br>
+            <small class="text-muted">{{ cautela.policial.matricula }}</small>
+        </td>
+        <td>
+            {% if cautela.criado_por %}
+                <i class="bi bi-person-plus me-1 text-primary"></i>
+                {{ cautela.criado_por.get_full_name|default:cautela.criado_por.username }}
+            {% else %}
+                <span class="text-muted">-</span>
+            {% endif %}
+        </td>
+        <td>  <!-- NOVA COLUNA - ARMEIRO QUE RECEBEU A DEVOLUÇÃO -->
+            {% if cautela.devolvido_por %}
+                <i class="bi bi-person-check me-1 text-success"></i>
+                <span class="text-success">{{ cautela.devolvido_por.get_full_name|default:cautela.devolvido_por.username }}</span>
+            {% else %}
+                <span class="text-muted">-</span>
+            {% endif %}
+        </td>
+        <td>{{ cautela.data_prevista_devolucao|date:"d/m/Y H:i" }}</td>
+<td>
+    <!-- Discriminação de TODOS os itens -->
+    <div>
+        {% for item in cautela.itens.all %}
+            {% if item.tipo_item == 'ARMAMENTO_PRINCIPAL' %}
+                <small class="badge bg-danger mb-1">🔫 Principal: {{ item.armamento }}</small><br>
+            {% elif item.tipo_item == 'ARMAMENTO_SECUNDARIO' %}
+                <small class="badge bg-warning mb-1">🔫 Secundário: {{ item.armamento }}</small><br>
+            {% elif item.tipo_item == 'EQUIPAMENTO' %}
+                <small class="badge bg-info mb-1">🛠️ {{ item.equipamento }}</small><br>
+            {% elif item.tipo_item == 'MUNICAO' %}
+                <small class="badge bg-success mb-1">🎯 {{ item.municao }} - Qtd: {{ item.quantidade_municao }}</small><br>
+            {% endif %}
+        {% empty %}
+            <span class="text-muted">Nenhum item</span>
+        {% endfor %}
+    </div>
+</td>
+        <td>
+            {% if cautela.status == 'ATIVA' %}
+                <span class="badge bg-success">Ativa</span>
+            {% elif cautela.status == 'DEVOLVIDA' %}
+                <span class="badge bg-secondary">Devolvida</span>
+            {% elif cautela.status == 'PARCIAL' %}
+                <span class="badge bg-warning">Parcial</span>
+            {% else %}
+                <span class="badge bg-danger">Cancelada</span>
+            {% endif %}
+        </td>
+        <td>
+            <div class="btn-group" role="group">
+                <a href="{% url 'cautela_armamento:cautela_detail' cautela.pk %}" 
+                   class="btn btn-sm btn-info" title="Detalhes">
+                    <i class="bi bi-eye"></i>
+                </a>
+                {% if cautela.status == 'ATIVA' %}
+                <a href="{% url 'cautela_armamento:cautela_devolucao' cautela.pk %}" 
+                   class="btn btn-sm btn-success" title="Registrar Devolução">
+                    <i class="bi bi-arrow-return-left"></i>
+                </a>
+                <a href="{% url 'cautela_armamento:cautela_update' cautela.pk %}" 
+                   class="btn btn-sm btn-warning" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'cautela_armamento:cautela_delete' cautela.pk %}" 
+                   class="btn btn-sm btn-danger" title="Excluir">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="9" class="text-center">  <!-- Ajustado para 9 colunas -->
+            <div class="py-4">
+                <i class="bi bi-inbox fs-1 d-block mb-3 text-muted"></i>
+                <p class="mb-2">Nenhuma cautela encontrada.</p>
+                <a href="{% url 'cautela_armamento:cautela_create' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Criar nova cautela
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit do filtro quando mudar
+    document.querySelector('select[name="status"]').addEventListener('change', function() {
+        this.form.submit();
+    });
+    document.querySelector('select[name="armeiro"]').addEventListener('change', function() {
+        this.form.submit();
+    });
+    document.querySelector('select[name="devolvido_por"]').addEventListener('change', function() {  // NOVO
+        this.form.submit();
+    });
+</script>
+{% endblock %}

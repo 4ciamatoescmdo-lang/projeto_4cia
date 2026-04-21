@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Viatura{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-truck me-2"></i>Detalhes da Viatura</h1>
+        <div>
+            <a href="{% url 'cadastro_vtrs:vtr_update' viatura.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            <a href="{% url 'cadastro_vtrs:vtr_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>{{ viatura.prefixo }} - {{ viatura.marca }} {{ viatura.modelo }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Prefixo:</th>
+                            <td>{{ viatura.prefixo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Placa:</th>
+                            <td>{{ viatura.placa }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tipo:</th>
+                            <td>{{ viatura.get_tipo_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Marca:</th>
+                            <td>{{ viatura.marca }}</td>
+                        </tr>
+                        <tr>
+                            <th>Modelo:</th>
+                            <td>{{ viatura.modelo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ano:</th>
+                            <td>{{ viatura.ano }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cor:</th>
+                            <td>{{ viatura.cor }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Renavam:</th>
+                            <td>{{ viatura.renavam|default:'-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Chassi:</th>
+                            <td>{{ viatura.chassi|default:'-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>KM Atual:</th>
+                            <td>{{ viatura.km_atual }} km</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if viatura.status == 'DISPONIVEL' %}
+                                    <span class="badge bg-success">Disponível</span>
+                                {% elif viatura.status == 'EM_USO' %}
+                                    <span class="badge bg-warning">Em Uso</span>
+                                {% elif viatura.status == 'MANUTENCAO' %}
+                                    <span class="badge bg-danger">Em Manutenção</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Baixada</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Situação:</th>
+                            <td>
+                                {% if viatura.ativo %}
+                                    <span class="badge bg-success">Ativa</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inativa</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Cadastrado em:</th>
+                            <td>{{ viatura.criado_em|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if viatura.observacoes %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>Observações</h6>
+                        </div>
+                        <div class="card-body">
+                            {{ viatura.observacoes|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

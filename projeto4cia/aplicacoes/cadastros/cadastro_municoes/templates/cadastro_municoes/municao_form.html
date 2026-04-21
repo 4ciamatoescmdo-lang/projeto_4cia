@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar{% else %}Nova{% endif %} Munição{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>
+                        <i class="bi bi-shield-plus me-2"></i>
+                        {% if object %}Editar{% else %}Nova{% endif %} Munição
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Calibre</label>
+                            {{ form.calibre }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Fabricante</label>
+                            {{ form.fabricante }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Modelo</label>
+                            {{ form.modelo }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Quantidade</label>
+                            {{ form.quantidade }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Data de Validade</label>
+                            {{ form.validade }}
+                            {% if form.validade.errors %}
+                                <div class="text-danger">{{ form.validade.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            {{ form.observacoes }}
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-2"></i>Salvar
+                            </button>
+                            <a href="{% url 'cadastro_municoes:municao_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+<!-- confirmar_exclusao.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>{{ titulo }}</h1>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5>Confirmar Exclusão</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Atenção!</strong> Esta ação não poderá ser desfeita.
+                    </div>
+                    
+                    <p>Tem certeza que deseja excluir o veículo abaixo?</p>
+                    
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Placa:</th>
+                            <td>{{ veiculo.placa }}</td>
+                        </tr>
+                        <tr>
+                            <th>Modelo:</th>
+                            <td>{{ veiculo.modelo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cor:</th>
+                            <td>{{ veiculo.cor }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ano:</th>
+                            <td>{{ veiculo.ano }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data Apreensão:</th>
+                            <td>{{ veiculo.data_apreensao|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Local:</th>
+                            <td>{{ veiculo.local_apreensao }}</td>
+                        </tr>
+                    </table>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sim, excluir
+                        </button>
+                        <a href="{% url 'cadastro_veiculo_apreendido:lista' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+{% endblock %}

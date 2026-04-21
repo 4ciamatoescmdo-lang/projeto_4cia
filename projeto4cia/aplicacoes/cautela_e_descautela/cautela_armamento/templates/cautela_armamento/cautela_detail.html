@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Cautela #{{ cautela.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-shield-plus me-2"></i>Detalhes da Cautela #{{ cautela.id }}</h1>
+        <div>
+            {% if cautela.status == 'ATIVA' %}
+            <a href="{% url 'cautela_armamento:cautela_devolucao' cautela.pk %}" class="btn btn-success">
+                <i class="bi bi-arrow-return-left me-2"></i>Registrar Devolução
+            </a>
+            <a href="{% url 'cautela_armamento:cautela_update' cautela.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            {% endif %}
+            <a href="{% url 'cautela_armamento:cautela_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações da Cautela -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Informações da Cautela</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Status:</th>
+                            <td>
+                                {% if cautela.status == 'ATIVA' %}
+                                    <span class="badge bg-success">Ativa</span>
+                                {% elif cautela.status == 'DEVOLVIDA' %}
+                                    <span class="badge bg-secondary">Devolvida</span>
+                                {% elif cautela.status == 'PARCIAL' %}
+                                    <span class="badge bg-warning">Parcial</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Cancelada</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Data Cautela:</th>
+                            <td>{{ cautela.data_cautela|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Previsão Devolução:</th>
+                            <td>{{ cautela.data_prevista_devolucao|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% if cautela.data_devolucao %}
+                        <tr>
+                            <th>Data Devolução:</th>
+                            <td>{{ cautela.data_devolucao|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Policial:</th>
+                            <td>
+                                <strong>{{ cautela.policial.nome_guerra }}</strong><br>
+                                {{ cautela.policial.get_patente_display }} {{ cautela.policial.nome_completo }}<br>
+                                Matrícula: {{ cautela.policial.matricula }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Cautelado por:</th>
+                            <td>
+                                <i class="bi bi-person-plus me-1"></i>
+                                {{ cautela.criado_por.get_full_name|default:cautela.criado_por.username }}
+                                <small class="text-muted d-block">{{ cautela.criado_em|date:"d/m/Y H:i" }}</small>
+                            </td>
+                        </tr>
+                        {% if cautela.devolvido_por %}  <!-- NOVO BLOCO -->
+                        <tr>
+                            <th>Devolvido por:</th>
+                            <td>
+                                <i class="bi bi-person-check me-1 text-success"></i>
+                                <span class="text-success">{{ cautela.devolvido_por.get_full_name|default:cautela.devolvido_por.username }}</span>
+                                <small class="text-muted d-block">{{ cautela.data_devolucao|date:"d/m/Y H:i" }}</small>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Observações</h5>
+                </div>
+                <div class="card-body">
+                    {{ cautela.observacoes|linebreaks|default:"Nenhuma observação registrada." }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Itens Cautelados -->
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Itens Cautelados</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Item</th>
+                            <th>Detalhes</th>
+                            <th>Status Devolução</th>
+                        </tr>
+                    </thead>
+<tbody>
+    {% for item in cautela.itens.all %}
+    <tr>
+        <td>
+            {% if item.tipo_item == 'ARMAMENTO_PRINCIPAL' %}
+                <span class="badge bg-danger">Armamento Principal</span>
+            {% elif item.tipo_item == 'ARMAMENTO_SECUNDARIO' %}
+                <span class="badge bg-warning">Armamento Secundário</span>
+            {% elif item.tipo_item == 'EQUIPAMENTO' %}
+                <span class="badge bg-info">Equipamento</span>
+            {% elif item.tipo_item == 'MUNICAO' %}
+                <span class="badge bg-success">Munição</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if item.armamento %}
+                {{ item.armamento.get_tipo_display }} {{ item.armamento.marca }} {{ item.armamento.modelo }}<br>
+                <small>Nº Série: {{ item.armamento.numero_serie }}</small>
+            {% elif item.equipamento %}
+                {{ item.equipamento.nome }}<br>
+                <small>Patrimônio: {{ item.equipamento.patrimonio|default:'-' }}</small>
+            {% elif item.municao %}
+                <!-- Exibindo as informações da munição -->
+                {{ item.municao.nome }}<br> <!-- Substitua 'nome' pelo campo correto da munição -->
+                <small>Tipo: {{ item.municao.tipo }}</small>  <!-- Ajuste conforme os campos do modelo Municao -->
+            {% endif %}
+        </td>
+        <td>
+            {% if item.quantidade_municao %}
+                Quantidade: {{ item.quantidade_municao }}
+            {% endif %}
+        </td>
+        <td>
+            {% if item.devolvido %}
+                <span class="badge bg-success">Devolvido</span>
+                <small>{{ item.data_devolucao_item|date:"d/m/Y H:i" }}</small>
+            {% else %}
+                <span class="badge bg-warning">Pendente</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4" class="text-center">Nenhum item cadastrado.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

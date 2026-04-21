@@ -1,0 +1,86 @@
+2026-04-20 19:25:57  INFO      =======================================================
+2026-04-20 19:25:57  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-20 19:25:57  INFO      =======================================================
+2026-04-20 19:25:57  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260420_192557.zip
+2026-04-20 19:25:57  INFO        + db.sqlite3
+2026-04-20 19:25:57  INFO        + media/ (pasta)
+2026-04-20 19:25:57  INFO      Zip criado: 0.2 MB
+2026-04-20 19:25:57  INFO      Autenticando no Google Drive...
+2026-04-20 19:25:59  ERROR     ERRO: credentials.json não encontrado!
+2026-04-20 19:25:59  ERROR     Baixe em: console.cloud.google.com → APIs → Credenciais → OAuth 2.0
+2026-04-20 19:27:35  INFO      =======================================================
+2026-04-20 19:27:35  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-20 19:27:35  INFO      =======================================================
+2026-04-20 19:27:35  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260420_192735.zip
+2026-04-20 19:27:35  INFO        + db.sqlite3
+2026-04-20 19:27:36  INFO        + media/ (pasta)
+2026-04-20 19:27:36  INFO      Zip criado: 0.2 MB
+2026-04-20 19:27:36  INFO      Autenticando no Google Drive...
+2026-04-20 19:27:36  INFO      Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=476040738446-v6rnefns28hhln58nvnb631g84bng5ai.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A55432%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&state=vUT3NNl97lKvccLuEygU9YAIO3sI7Y&code_challenge=XX-2MaCkjh7rfu9ofAg7RtOEo-KULwmDRMFen6923P8&code_challenge_method=S256&access_type=offline
+2026-04-20 19:28:22  INFO      =======================================================
+2026-04-20 19:28:22  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-20 19:28:22  INFO      =======================================================
+2026-04-20 19:28:22  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260420_192822.zip
+2026-04-20 19:28:22  INFO        + db.sqlite3
+2026-04-20 19:28:22  INFO        + media/ (pasta)
+2026-04-20 19:28:22  INFO      Zip criado: 0.2 MB
+2026-04-20 19:28:22  INFO      Autenticando no Google Drive...
+2026-04-20 19:28:23  INFO      Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=476040738446-v6rnefns28hhln58nvnb631g84bng5ai.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A51058%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&state=ADPzjGZttr6ta4UKiBxfWc4szKQWBi&code_challenge=UxhRNyluyRhnLoAdxJdhNPt4tcPsO_r-Qkr8g0azJDE&code_challenge_method=S256&access_type=offline
+2026-04-20 19:30:27  INFO      =======================================================
+2026-04-20 19:30:27  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-20 19:30:27  INFO      =======================================================
+2026-04-20 19:30:27  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260420_193027.zip
+2026-04-20 19:30:27  INFO        + db.sqlite3
+2026-04-20 19:30:27  INFO        + media/ (pasta)
+2026-04-20 19:30:27  INFO      Zip criado: 0.2 MB
+2026-04-20 19:30:27  INFO      Autenticando no Google Drive...
+2026-04-20 19:30:28  INFO      Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=476040738446-v6rnefns28hhln58nvnb631g84bng5ai.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A57435%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&state=Ryo2s0u0xCDkql0PVkN8mHf7BPsqDs&code_challenge=FBVA0g_cNywwAUie-3y01MF2P9wqMAsFnZU_XBJiOCg&code_challenge_method=S256&access_type=offline
+2026-04-20 19:49:51  INFO      =======================================================
+2026-04-20 19:49:51  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-20 19:49:51  INFO      =======================================================
+2026-04-20 19:49:51  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260420_194951.zip
+2026-04-20 19:49:51  INFO        + db.sqlite3
+2026-04-20 19:49:51  INFO        + media/ (pasta)
+2026-04-20 19:49:51  INFO      Zip criado: 0.2 MB
+2026-04-20 19:49:51  INFO      Autenticando no Google Drive...
+2026-04-20 19:49:52  INFO      Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=476040738446-v6rnefns28hhln58nvnb631g84bng5ai.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A60996%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&state=ZzmVBQvj3ar5LFeztP7cmglqvRFYBM&code_challenge=xrM77LdOa_ZwGpPXtb82sBxeUQG3odIASdthhxefYxQ&code_challenge_method=S256&access_type=offline
+2026-04-20 19:50:22  INFO      =======================================================
+2026-04-20 19:50:22  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-20 19:50:22  INFO      =======================================================
+2026-04-20 19:50:22  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260420_195022.zip
+2026-04-20 19:50:23  INFO        + db.sqlite3
+2026-04-20 19:50:23  INFO        + media/ (pasta)
+2026-04-20 19:50:23  INFO      Zip criado: 0.2 MB
+2026-04-20 19:50:23  INFO      Autenticando no Google Drive...
+2026-04-20 19:50:23  INFO      Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=476040738446-v6rnefns28hhln58nvnb631g84bng5ai.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A64420%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&state=5TPIY2WNTX7YKtN8n6RPZJshXgkEJN&code_challenge=dbjMwmtL2bCWok40gK1ddR61W5iMWl0JWEtl0nUFuQk&code_challenge_method=S256&access_type=offline
+2026-04-21 07:37:23  INFO      =======================================================
+2026-04-21 07:37:23  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-21 07:37:23  INFO      =======================================================
+2026-04-21 07:37:23  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260421_073723.zip
+2026-04-21 07:37:23  INFO        + db.sqlite3
+2026-04-21 07:37:23  INFO        + media/ (pasta)
+2026-04-21 07:37:23  INFO      Zip criado: 0.2 MB
+2026-04-21 07:37:23  INFO      Autenticando no Google Drive...
+2026-04-21 07:37:25  INFO      Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=428719503615-gv9ug6rds7lhrl4ne5ljjfba7vg1995g.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A58127%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&state=xp99nFYc4fzxgCrsAB6vTfRs5oboSq&code_challenge=U5J8LfWEk_A_gNdaCKYBinXUrAFfdK9wQpVpQaIGidM&code_challenge_method=S256&access_type=offline
+2026-04-21 07:37:41  INFO      "GET /?state=xp99nFYc4fzxgCrsAB6vTfRs5oboSq&iss=https://accounts.google.com&code=4/0Aci98E9rU_4fVfKYbjs6h7na5qukXiom5zBygw9KKbXrONHCtp_rff9XpkaMV62TL4iYog&scope=https://www.googleapis.com/auth/drive.file HTTP/1.1" 200 65
+2026-04-21 07:37:42  INFO      file_cache is only supported with oauth2client<4.0.0
+2026-04-21 07:37:43  INFO      Pasta criada no Drive: Backups_Django_Policia (id=18-vVnJtVnZMAdMXc1kuFoQ2EWM5iNI4S)
+2026-04-21 07:37:43  INFO      Enviando para o Drive: backup_20260421_073723.zip ...
+2026-04-21 07:37:46  INFO      Upload concluído: backup_20260421_073723.zip (id=1pF8-yAt0HKaI3WJID3nxbx8ku2J7TGX3)
+2026-04-21 07:37:46  INFO      BACKUP CONCLUÍDO COM SUCESSO ✓
+2026-04-21 08:30:02  INFO      =======================================================
+2026-04-21 08:30:02  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-21 08:30:02  INFO      =======================================================
+2026-04-21 08:30:02  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260421_083002.zip
+2026-04-21 08:30:02  INFO        + db.sqlite3
+2026-04-21 08:30:02  INFO        + media/ (pasta)
+2026-04-21 08:30:02  INFO      Zip criado: 1.8 MB
+2026-04-21 08:30:02  INFO      Autenticando no Google Drive...
+2026-04-21 08:30:02  ERROR     ERRO NO BACKUP: No module named 'google'
+Traceback (most recent call last):
+  File "C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\scripts\backup_automatico.py", line 205, in main
+    service = autenticar_drive()
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\scripts\backup_automatico.py", line 108, in autenticar_drive
+    from google.oauth2.credentials import Credentials
+ModuleNotFoundError: No module named 'google'

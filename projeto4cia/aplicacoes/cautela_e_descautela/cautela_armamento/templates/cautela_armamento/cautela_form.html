@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}🔫 Nova Cautela de Armamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+                <div class="feature-icon">
+                    <span class="display-4">🔫</span>
+                </div>
+                <div>
+                    <h1 class="display-6 fw-bold mb-0">Nova Cautela de Armamento</h1>
+                    <p class="text-muted mt-2">Registre uma nova cautela com todos os detalhes necessários</p>
+                </div>
+            </div>
+            <hr class="mt-3">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-gradient-primary text-white rounded-top-4 py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i> 📋 Formulário de Registro
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="cautelaForm" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ form.non_field_errors }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
+
+                        <!-- Dados do Policial -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-header bg-light rounded-top-3 py-3">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-user-shield me-2"></i> 👮‍♂️ Dados da Cautela
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="id_policial" class="form-label fw-semibold">
+                                                        👤 POLICIAL RESPONSÁVEL:
+                                                    </label>
+                                                    {{ form.policial }}
+                                                    {% if form.policial.errors %}
+                                                    <div class="text-danger small mt-1">{{ form.policial.errors }}</div>
+                                                    {% endif %}
+                                                    <small class="text-muted">Selecione o policial que receberá o armamento</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="id_data_prevista_devolucao" class="form-label fw-semibold">
+                                                        📅 PREVISÃO DE DEVOLUÇÃO:
+                                                    </label>
+                                                    {{ form.data_prevista_devolucao }}
+                                                    {% if form.data_prevista_devolucao.errors %}
+                                                    <div class="text-danger small mt-1">{{ form.data_prevista_devolucao.errors }}</div>
+                                                    {% endif %}
+                                                    <small class="text-muted">Data limite para devolução do material</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Armamentos -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-header bg-light rounded-top-3 py-3">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-gun me-2"></i> 🔫 Armamentos
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="id_armamento_principal" class="form-label fw-semibold">
+                                                        ⭐ ARMAMENTO PRINCIPAL:
+                                                    </label>
+                                                    {{ form.armamento_principal }}
+                                                    <small class="text-muted">Selecione o armamento principal (obrigatório)</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="id_armamento_secundario" class="form-label fw-semibold">
+                                                        🔄 ARMAMENTO SECUNDÁRIO:
+                                                    </label>
+                                                    {{ form.armamento_secundario }}
+                                                    <small class="text-muted">Selecione o armamento secundário (opcional)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipamentos -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-header bg-light rounded-top-3 py-3">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-helmet-safety me-2"></i> 🛡️ Equipamentos
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="id_equipamento_01" class="form-label fw-semibold">
+                                                        📦 EQUIP. 01:
+                                                    </label>
+                                                    {{ form.equipamento_01 }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="id_equipamento_02" class="form-label fw-semibold">
+                                                        📦 EQUIP. 02:
+                                                    </label>
+                                                    {{ form.equipamento_02 }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="id_equipamento_03" class="form-label fw-semibold">
+                                                        📦 EQUIP. 03:
+                                                    </label>
+                                                    {{ form.equipamento_03 }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="id_equipamento_04" class="form-label fw-semibold">
+                                                        📦 EQUIP. 04:
+                                                    </label>
+                                                    {{ form.equipamento_04 }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Munições -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm rounded-3 h-100">
+                                    <div class="card-header bg-light rounded-top-3 py-3">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-bullseye me-2"></i> 🎯 Munição 01
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="id_tipo_municao_01" class="form-label fw-semibold">
+                                                🔫 TIPO DE MUNIÇÃO:
+                                            </label>
+                                            {{ form.tipo_municao_01 }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="id_quantidade_municao_01" class="form-label fw-semibold">
+                                                🔢 QUANTIDADE:
+                                            </label>
+                                            {{ form.quantidade_municao_01 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm rounded-3 h-100">
+                                    <div class="card-header bg-light rounded-top-3 py-3">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-bullseye me-2"></i> 🎯 Munição 02
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="id_tipo_municao_02" class="form-label fw-semibold">
+                                                🔫 TIPO DE MUNIÇÃO:
+                                            </label>
+                                            {{ form.tipo_municao_02 }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="id_quantidade_municao_02" class="form-label fw-semibold">
+                                                🔢 QUANTIDADE:
+                                            </label>
+                                            {{ form.quantidade_municao_02 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-header bg-light rounded-top-3 py-3">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-pen me-2"></i> 📝 Observações
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="id_observacoes" class="form-label fw-semibold">
+                                                💬 OBSERVAÇÕES GERAIS:
+                                            </label>
+                                            {{ form.observacoes }}
+                                            <small class="text-muted">Adicione informações adicionais se necessário</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-end gap-3">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                                    <i class="fas fa-check-circle me-2"></i> ✅ Registrar Cautela
+                                </button>
+                                <a href="{% url 'cautela_armamento:cautela_list' %}" class="btn btn-outline-secondary btn-lg px-5 rounded-pill">
+                                    <i class="fas fa-times-circle me-2"></i> ❌ Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .container-fluid {
+        background: transparent;
+    }
+
+    .bg-gradient-primary {
+        background: var(--primary-gradient) !important;
+    }
+
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+
+    .rounded-top-4 {
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+    }
+
+    .rounded-3 {
+        border-radius: 0.75rem !important;
+    }
+
+    .rounded-top-3 {
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+    }
+
+    .rounded-pill {
+        border-radius: 50px !important;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-size: 0.9rem;
+    }
+
+    /* Estilo moderno para selects e inputs */
+    select, input, textarea {
+        border: 2px solid #e1e8ed;
+        border-radius: 10px !important;
+        padding: 10px 15px !important;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+        width: 100%;
+    }
+
+    select:focus, input:focus, textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background-color: white;
+        outline: none;
+    }
+
+    /* Estilo específico para selects para evitar estouro */
+    select.form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 16px 12px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    select.form-select option {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    /* Garantir que selects não ultrapassem os limites */
+    .col-md-3, .col-md-6, .col-md-12 {
+        overflow: visible;
+    }
+
+    select.form-select {
+        max-width: 100%;
+        word-wrap: break-word;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        background: transparent;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+        border-color: #6c757d;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .feature-icon {
+        background: var(--primary-gradient);
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+        font-size: 0.85rem;
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 0;
+        border-top: 2px solid linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    h1.display-6 {
+        font-size: 1.75rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .btn {
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        .d-flex.justify-content-end {
+            flex-direction: column;
+            gap: 10px !important;
+        }
+        
+        .col-md-3, .col-md-6 {
+            margin-bottom: 15px;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .display-4 {
+            font-size: 2rem;
+        }
+        
+        h1.display-6 {
+            font-size: 1.25rem;
+        }
+    }
+
+    /* Animações suaves */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Estilo para campos inválidos */
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 10px;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Máscara para data
+        const dataInput = document.getElementById('id_data_prevista_devolucao');
+        if (dataInput) {
+            dataInput.type = 'date';
+        }
+        
+        // Adicionar classe para selects para melhor responsividade
+        const allSelects = document.querySelectorAll('select');
+        allSelects.forEach(select => {
+            select.classList.add('form-select');
+            
+            // Adicionar evento para ajustar largura dos selects
+            select.addEventListener('change', function() {
+                if (this.options.length > 0 && this.selectedIndex >= 0) {
+                    const selectedText = this.options[this.selectedIndex].text;
+                    if (selectedText.length > 50) {
+                        this.title = selectedText;
+                    }
+                }
+            });
+        });
+        
+        // Validação de munições
+        const tipoMunicao1 = document.getElementById('id_tipo_municao_01');
+        const qtdMunicao1 = document.getElementById('id_quantidade_municao_01');
+        const tipoMunicao2 = document.getElementById('id_tipo_municao_02');
+        const qtdMunicao2 = document.getElementById('id_quantidade_municao_02');
+        
+        function validarMunicao(tipoInput, qtdInput) {
+            if (tipoInput && qtdInput) {
+                tipoInput.addEventListener('change', function() {
+                    if (this.value) {
+                        qtdInput.required = true;
+                        qtdInput.classList.add('required');
+                    } else {
+                        qtdInput.required = false;
+                        qtdInput.value = '';
+                        qtdInput.classList.remove('required');
+                    }
+                });
+            }
+        }
+        
+        validarMunicao(tipoMunicao1, qtdMunicao1);
+        validarMunicao(tipoMunicao2, qtdMunicao2);
+        
+        // Adicionar feedback visual para campos obrigatórios
+        const requiredFields = document.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            field.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

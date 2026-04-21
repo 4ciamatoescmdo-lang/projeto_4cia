@@ -1,0 +1,40 @@
+<h2>RELATÓRIO ANALÍTICO Nº {{ r.numero }}</h2>
+
+<h3>DADOS INFORMATIVOS</h3>
+
+<p><strong>Código:</strong> {{ r.codigo_ocorrencia }}</p>
+<p><strong>Local:</strong> {{ r.local }}</p>
+<p><strong>Data/Hora:</strong> {{ r.data_hora }}</p>
+
+<p><strong>Comunicante:</strong> {{ r.comunicante }}</p>
+
+<p><strong>Testemunhas:</strong></p>
+<ul>
+    {% for t in r.testemunhas.all %}
+        <li>{{ t.nome }} - {{ t.cpf }}</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Vítima:</strong> {{ r.vitima.nome }}</p>
+
+<p><strong>Materiais:</strong> {{ r.materiais_apreendidos }}</p>
+
+<p><strong>Solução:</strong>
+    Evadiu: {{ r.evadiu }} |
+    SAMU: {{ r.samu }} |
+    IML: {{ r.iml }}
+</p>
+
+<h3>RELATO</h3>
+<p>{{ r.relato }}</p>
+
+<h3>PROVIDÊNCIAS</h3>
+<ul>
+    {% for p in r.providencias.all %}
+        <li>{{ p.descricao }}</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Local:</strong> {{ r.local_final }}</p>
+<p><strong>Data:</strong> {{ r.data_final }}</p>
+<p><strong>Responsável:</strong> {{ r.responsavel }}</p>

@@ -1,0 +1,394 @@
+<!-- aplicacoes/escala_diaria/templates/escala_diaria/nova_escala.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nova Escala Diária{% endblock %}
+
+{% block extra_css %}
+<style>
+    .section-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        background-color: #fff;
+    }
+    .section-title {
+        color: #0d6efd;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 0.5rem;
+    }
+    .btn-add {
+        margin-bottom: 1rem;
+    }
+    .item-row {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+    }
+    .remove-btn {
+        margin-top: 1.8rem;
+    }
+    @media (max-width: 768px) {
+        .remove-btn {
+            margin-top: 0.5rem;
+        }
+    }
+    .result-box {
+        background-color: #f8f9fa;
+        border: 2px solid #28a745;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        font-family: 'Courier New', monospace;
+        white-space: pre-wrap;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .copy-btn {
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">📋 Gerador de Escala Diária</h1>
+    
+    <form method="POST" id="escalaForm">
+        {% csrf_token %}
+        
+        <!-- Data da Escala -->
+        <div class="section-card">
+            <h3 class="section-title">📅 Data da Escala</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="data_escala" class="form-label">Data</label>
+                    <input type="date" class="form-control" id="data_escala" name="data_escala" 
+                           value="{{ data_hoje|date:'Y-m-d' }}" required>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Permanência -->
+        <div class="section-card">
+            <h3 class="section-title">🏠 Permanência (Serviço de 24hs)</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="permanencia" class="form-label">Policial na Permanência</label>
+                    <select class="form-control" id="permanencia" name="permanencia">
+                        <option value="">-- Selecione --</option>
+                        {% for policial in policiais %}
+                        <option value="{{ policial.id }}">{{ policial }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Serviço Externo -->
+        <div class="section-card">
+            <h3 class="section-title">🚓 Serviço Externo</h3>
+            
+            <button type="button" class="btn btn-success btn-add" id="addPolicialExterno">
+                <i class="fas fa-plus"></i> Adicionar Policial ao Serviço Externo
+            </button>
+            
+            <div id="policiaisExternosContainer">
+                <!-- Os itens serão adicionados aqui via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Permutas -->
+        <div class="section-card">
+            <h3 class="section-title">🔄 Permutas</h3>
+            <button type="button" class="btn btn-warning btn-add" id="addPermuta">
+                <i class="fas fa-plus"></i> Adicionar Permuta
+            </button>
+            
+            <div id="permutasContainer">
+                <!-- As permutas serão adicionadas aqui via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Dispensas -->
+        <div class="section-card">
+            <h3 class="section-title">⚠️ Dispensas e Faltas</h3>
+            <button type="button" class="btn btn-danger btn-add" id="addDispensa">
+                <i class="fas fa-plus"></i> Adicionar Dispensa
+            </button>
+            
+            <div id="dispensasContainer">
+                <!-- As dispensas serão adicionadas aqui via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-file-alt"></i> GERAR ESCALA
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg" onclick="limparFormulario()">
+                    <i class="fas fa-eraser"></i> LIMPAR
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    {% if texto_gerado %}
+    <!-- Resultado da Escala -->
+    <div class="section-card">
+        <h3 class="section-title">✅ Escala Gerada</h3>
+        <div class="result-box" id="textoEscala">
+            {{ texto_gerado }}
+        </div>
+        <button class="btn btn-success copy-btn" onclick="copiarTexto()">
+            <i class="fas fa-copy"></i> Copiar para WhatsApp
+        </button>
+        <a href="{% url 'escala_diaria:historico' %}" class="btn btn-info copy-btn">
+            <i class="fas fa-history"></i> Ver Histórico
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Dados para os selects
+    const policiais = [
+        {% for p in policiais %}
+        {id: {{ p.id }}, nome: "{{ p }}", nome_guerra: "{{ p.nome_guerra }}", patente: "{{ p.get_patente_display|default:p.patente }}" },
+        {% endfor %}
+    ];
+    
+    const viaturas = [
+        {% for v in viaturas %}
+        {id: {{ v.id }}, prefixo: "{{ v.prefixo }}" },
+        {% endfor %}
+    ];
+    
+    const funcoes = [
+        {% for f in funcoes %}
+        {valor: "{{ f.0 }}", texto: "{{ f.1 }}" },
+        {% endfor %}
+    ];
+    
+    const tiposPermuta = [
+        {% for t in tipos_permuta %}
+        {valor: "{{ t.0 }}", texto: "{{ t.1 }}" },
+        {% endfor %}
+    ];
+    
+    const motivosDispensa = [
+        {% for m in motivos_dispensa %}
+        {valor: "{{ m.0 }}", texto: "{{ m.1 }}" },
+        {% endfor %}
+    ];
+    
+    // Função auxiliar para criar options de policial
+    function criarOptionsPolicial() {
+        let options = '<option value="">-- Selecione --</option>';
+        policiais.forEach(p => {
+            options += `<option value="${p.id}">${p.nome}</option>`;
+        });
+        return options;
+    }
+    
+    // Contadores
+    let externoCount = 0;
+    let permutaCount = 0;
+    let dispensaCount = 0;
+    
+    // Função para adicionar policial externo
+    document.getElementById('addPolicialExterno').addEventListener('click', function() {
+        const container = document.getElementById('policiaisExternosContainer');
+        const div = document.createElement('div');
+        div.className = 'item-row';
+        div.id = `externo_${externoCount}`;
+        
+        let html = `
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">Policial</label>
+                    <select class="form-control" name="externo_policial_${externoCount}">
+                        ${criarOptionsPolicial()}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Viatura</label>
+                    <select class="form-control" name="externo_viatura_${externoCount}">
+                        <option value="">-- Selecione --</option>
+        `;
+        
+        viaturas.forEach(v => {
+            html += `<option value="${v.id}">${v.prefixo}</option>`;
+        });
+        
+        html += `
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Função</label>
+                    <select class="form-control" name="externo_funcao_${externoCount}">
+                        <option value="">-- Selecione --</option>
+        `;
+        
+        funcoes.forEach(f => {
+            html += `<option value="${f.valor}">${f.texto}</option>`;
+        });
+        
+        html += `
+                    </select>
+                </div>
+                <div class="col-md-2 remove-btn">
+                    <button type="button" class="btn btn-danger" onclick="removerItem('externo_${externoCount}')">
+                        <i class="fas fa-trash"></i> Remover
+                    </button>
+                </div>
+                <input type="hidden" name="externo_indice" value="${externoCount}">
+            </div>
+        `;
+        
+        div.innerHTML = html;
+        container.appendChild(div);
+        externoCount++;
+    });
+    
+    // Função para adicionar permuta
+    document.getElementById('addPermuta').addEventListener('click', function() {
+        const container = document.getElementById('permutasContainer');
+        const div = document.createElement('div');
+        div.className = 'item-row';
+        div.id = `permuta_${permutaCount}`;
+        
+        let html = `
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Policial A</label>
+                    <select class="form-control" name="permuta_policial_a_${permutaCount}">
+                        ${criarOptionsPolicial()}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Policial B</label>
+                    <select class="form-control" name="permuta_policial_b_${permutaCount}">
+                        ${criarOptionsPolicial()}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-control" name="permuta_tipo_${permutaCount}">
+                        <option value="">-- Selecione --</option>
+        `;
+        
+        tiposPermuta.forEach(t => {
+            html += `<option value="${t.valor}">${t.texto}</option>`;
+        });
+        
+        html += `
+                    </select>
+                </div>
+                <div class="col-md-3 remove-btn">
+                    <button type="button" class="btn btn-danger" onclick="removerItem('permuta_${permutaCount}')">
+                        <i class="fas fa-trash"></i> Remover
+                    </button>
+                </div>
+                <input type="hidden" name="permuta_indice" value="${permutaCount}">
+            </div>
+        `;
+        
+        div.innerHTML = html;
+        container.appendChild(div);
+        permutaCount++;
+    });
+    
+    // Função para adicionar dispensa
+    document.getElementById('addDispensa').addEventListener('click', function() {
+        const container = document.getElementById('dispensasContainer');
+        const div = document.createElement('div');
+        div.className = 'item-row';
+        div.id = `dispensa_${dispensaCount}`;
+        
+        let html = `
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Policial</label>
+                    <select class="form-control" name="dispensa_policial_${dispensaCount}">
+                        ${criarOptionsPolicial()}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Motivo</label>
+                    <select class="form-control" name="dispensa_motivo_${dispensaCount}">
+                        <option value="">-- Selecione --</option>
+        `;
+        
+        motivosDispensa.forEach(m => {
+            html += `<option value="${m.valor}">${m.texto}</option>`;
+        });
+        
+        html += `
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-control" name="dispensa_tipo_${dispensaCount}">
+                        <option value="">-- Selecione --</option>
+        `;
+        
+        tiposPermuta.forEach(t => {
+            html += `<option value="${t.valor}">${t.texto}</option>`;
+        });
+        
+        html += `
+                    </select>
+                </div>
+                <div class="col-md-3 remove-btn">
+                    <button type="button" class="btn btn-danger" onclick="removerItem('dispensa_${dispensaCount}')">
+                        <i class="fas fa-trash"></i> Remover
+                    </button>
+                </div>
+                <input type="hidden" name="dispensa_indice" value="${dispensaCount}">
+            </div>
+        `;
+        
+        div.innerHTML = html;
+        container.appendChild(div);
+        dispensaCount++;
+    });
+    
+    // Função para remover item
+    function removerItem(id) {
+        document.getElementById(id).remove();
+    }
+    
+    // Função para copiar texto
+    function copiarTexto() {
+        const texto = document.getElementById('textoEscala').innerText;
+        navigator.clipboard.writeText(texto).then(function() {
+            alert('Texto copiado para a área de transferência!');
+        }, function() {
+            alert('Erro ao copiar texto. Tente novamente.');
+        });
+    }
+    
+    // Função para limpar formulário
+    function limparFormulario() {
+        if(confirm('Tem certeza que deseja limpar todos os campos?')) {
+            document.getElementById('escalaForm').reset();
+            document.getElementById('policiaisExternosContainer').innerHTML = '';
+            document.getElementById('permutasContainer').innerHTML = '';
+            document.getElementById('dispensasContainer').innerHTML = '';
+            externoCount = 0;
+            permutaCount = 0;
+            dispensaCount = 0;
+        }
+    }
+</script>
+{% endblock %}

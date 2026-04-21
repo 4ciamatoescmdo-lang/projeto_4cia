@@ -1,0 +1,211 @@
+<!-- templates/cadastro_veiculo_apreendido/termo_devolucao_html.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Termo de Devolução - {{ devolucao.veiculo.placa }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+                        <div class="logo-container mb-3">
+                <img src="{% static 'cadastro_veiculo_apreendido/image.png' %}" 
+                     alt="Logo Polícia Militar do Maranhão" 
+                     style="height: 200px; width: auto;">
+
+            </div>
+            <h4>ESTADO DO MARANHÃO</h4>
+            <h4>SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h4>
+            <h4>POLÍCIA MILITAR DO MARANHÃO</h4>
+            <h4>11º BATALHÃO DE POLÍCIA MILITAR – 4ª CIA MATÕES</h4>    
+            <br>
+            <h2>TERMO DE DEVOLUÇÃO DE VEÍCULO APREENDIDO</h2>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5>Documento de Devolução</h5>
+                </div>
+                <div class="card-body">
+                    <h5>1. DADOS DO VEÍCULO</h5>
+                    <table class="table table-bordered">
+                        <tr><th style="width: 30%;">Modelo:</th><td>{{ devolucao.veiculo.modelo }}</td></tr>
+                        <tr><th>Placa:</th><td>{{ devolucao.veiculo.placa }}</td></tr>
+                        <tr><th>Cor:</th><td>{{ devolucao.veiculo.cor }}</td></tr>
+                        <tr><th>Ano:</th><td>{{ devolucao.veiculo.ano }}</td></tr>
+                        <tr><th>Data da Apreensão:</th><td>{{ devolucao.veiculo.data_apreensao|date:"d/m/Y" }}</td></tr>
+                        <tr><th>Local da Apreensão:</th><td>{{ devolucao.veiculo.local_apreensao }}</td></tr>
+                    </table>
+
+                    <h5>2. DADOS DO PROPRIETÁRIO</h5>
+                    <table class="table table-bordered">
+                        <tr><th style="width: 30%;">Nome:</th><td>{{ devolucao.proprietario_nome }}</td></tr>
+                        <tr><th>CPF:</th><td>{{ devolucao.proprietario_cpf }}</td></tr>
+                        <tr><th>RG:</th><td>{{ devolucao.proprietario_rg }}</td></tr>
+                        <tr><th>Endereço:</th><td>{{ devolucao.proprietario_endereco }}</td></tr>
+                        <tr><th>Telefone:</th><td>{{ devolucao.proprietario_telefone }}</td></tr>
+                        <tr><th>E-mail:</th><td>{{ devolucao.proprietario_email|default:"Não informado" }}</td></tr>
+                    </table>
+
+                    <h5>3. CONDIÇÕES DO VEÍCULO NO ATO DA DEVOLUÇÃO</h5>
+                    <table class="table table-bordered">
+                        <tr><th style="width: 30%;">Estado:</th>
+                            <td>
+                                {% if devolucao.estado_veiculo == 'OTIMO' %}Ótimo
+                                {% elif devolucao.estado_veiculo == 'BOM' %}Bom
+                                {% elif devolucao.estado_veiculo == 'REGULAR' %}Regular
+                                {% elif devolucao.estado_veiculo == 'DANIFICADO' %}Danificado
+                                {% elif devolucao.estado_veiculo == 'AVARIADO' %}Avariado
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th>Quilometragem:</th><td>{{ devolucao.km_atual|default:"Não informada" }} km</td></tr>
+                        <tr><th>Observações:</th><td>{{ devolucao.observacoes_veiculo|default:"Nenhuma" }}</td></tr>
+                    </table>
+
+                    <h5>4. DOCUMENTAÇÃO APRESENTADA</h5>
+                    <table class="table table-bordered">
+                        <tr><td>{{ devolucao.documentos_apresentados }}</td></tr>
+                    </table>
+
+                    <h5>5. DADOS DA DEVOLUÇÃO</h5>
+                    <table class="table table-bordered">
+                        <tr><th style="width: 30%;">Data:</th><td>{{ devolucao.data_devolucao|date:"d/m/Y" }}</td></tr>
+                        <tr><th>Hora:</th><td>{{ devolucao.hora_devolucao|time:"H:i" }}</td></tr>
+                        <tr><th>Responsável:</th><td>{{ devolucao.responsavel_devolucao.get_full_name|default:devolucao.responsavel_devolucao.username }}</td></tr>
+                    </table>
+
+                    {% if devolucao.observacoes_gerais %}
+                    <h5>6. OBSERVAÇÕES GERAIS</h5>
+                    <table class="table table-bordered">
+                        <tr><td>{{ devolucao.observacoes_gerais }}</td></tr>
+                    </table>
+                    {% endif %}
+
+                    <h5>7. ASSINATURAS</h5>
+                    <div class="row mt-4">
+                        <div class="col-md-6 text-center">
+                            <br>
+                            <br>
+                            <div class="border-top pt-2" style="width: 80%; margin: 0 auto;">
+                                
+                                <strong>{{ devolucao.proprietario_nome }}</strong>
+                            </div>
+                            <p>Proprietário</p>
+                        </div>
+                        <div class="col-md-6 text-center">
+                                                        <br>
+                            <br>
+                            <div class="border-top pt-2" style="width: 80%; margin: 0 auto;">
+                                <strong>{{ devolucao.responsavel_devolucao.get_full_name|default:devolucao.responsavel_devolucao.username }}</strong>
+                            </div>
+                            <p>Responsável pela Devolução</p>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="text-center mt-4">
+                        <p><small>Documento gerado eletronicamente em {{ devolucao.created_at|date:"d/m/Y H:i:s" }}</small></p>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <button class="btn btn-primary" onclick="window.print()">
+                                <i class="fas fa-print"></i> Imprimir
+                            </button>
+                            <a href="{% url 'cadastro_veiculo_apreendido:lista' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style media="print">
+    /* Esconde elementos que não devem aparecer na impressão */
+    .navbar, 
+    .sidebar, 
+    .main-sidebar,
+    .nav-sidebar,
+    .main-header,
+    .brand-link,
+    footer,
+    .btn,
+    button,
+    .card-header .btn,
+    .card-tools,
+    [class*="sidebar"],
+    [class*="navbar"],
+    .print-hide {
+        display: none !important;
+    }
+    
+    /* Remove margens e fundos para impressão */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+    
+    /* Ajusta o container principal */
+    .container,
+    .card,
+    .card-body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Garante que o conteúdo ocupe toda a largura */
+    .col-12,
+    .row {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Remove a cor de fundo do card header */
+    .card-header {
+        background: white !important;
+        border: none !important;
+        padding: 10px 0 !important;
+    }
+    
+    /* Remove quebras de página indesejadas */
+    .page-break {
+        page-break-before: avoid;
+        page-break-after: avoid;
+    }
+    
+    /* Mantém as tabelas legíveis */
+    table {
+        page-break-inside: avoid;
+        width: 100% !important;
+    }
+    
+    /* Ajusta o espaçamento para impressão */
+    .mt-4, .mb-4 {
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    /* Garante que as assinaturas apareçam */
+    .border-top {
+        border-top: 1px solid black !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+{% endblock %}

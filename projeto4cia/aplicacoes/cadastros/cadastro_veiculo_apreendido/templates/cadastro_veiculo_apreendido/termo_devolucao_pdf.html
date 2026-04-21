@@ -1,0 +1,162 @@
+<!-- templates/cadastro_veiculo_apreendido/termo_devolucao_pdf.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Termo de Devolução - {{ devolucao.veiculo.placa }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            font-size: 12px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        .header h2 {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .header h3 {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            background-color: #f0f0f0;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .info-row {
+            margin-bottom: 8px;
+        }
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 150px;
+        }
+        .assinaturas {
+            margin-top: 40px;
+        }
+        .assinatura {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .linha-assinatura {
+            margin-top: 40px;
+            width: 300px;
+            border-top: 1px solid black;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td, th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ESTADO DO MARANHÃO</h1>
+        <h2>SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h2>
+        <h2>POLÍCIA MILITAR DO MARANHÃO</h2>
+        <h3>11º BATALHÃO DE POLÍCIA MILITAR – 4ª CIA MATÕES</h3>
+    </div>
+    
+    <div class="title">
+        TERMO DE DEVOLUÇÃO DE VEÍCULO APREENDIDO
+    </div>
+    
+    <div class="section">
+        <div class="section-title">1. DADOS DO VEÍCULO</div>
+        <div class="info-row"><span class="label">Modelo:</span> {{ devolucao.veiculo.modelo }}</div>
+        <div class="info-row"><span class="label">Placa:</span> {{ devolucao.veiculo.placa }}</div>
+        <div class="info-row"><span class="label">Cor:</span> {{ devolucao.veiculo.cor }}</div>
+        <div class="info-row"><span class="label">Ano:</span> {{ devolucao.veiculo.ano }}</div>
+        <div class="info-row"><span class="label">Data da Apreensão:</span> {{ devolucao.veiculo.data_apreensao|date:"d/m/Y" }}</div>
+        <div class="info-row"><span class="label">Local da Apreensão:</span> {{ devolucao.veiculo.local_apreensao }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">2. DADOS DO PROPRIETÁRIO</div>
+        <div class="info-row"><span class="label">Nome:</span> {{ devolucao.proprietario_nome }}</div>
+        <div class="info-row"><span class="label">CPF:</span> {{ devolucao.proprietario_cpf }}</div>
+        <div class="info-row"><span class="label">RG:</span> {{ devolucao.proprietario_rg }}</div>
+        <div class="info-row"><span class="label">Endereço:</span> {{ devolucao.proprietario_endereco }}</div>
+        <div class="info-row"><span class="label">Telefone:</span> {{ devolucao.proprietario_telefone }}</div>
+        <div class="info-row"><span class="label">E-mail:</span> {{ devolucao.proprietario_email|default:"Não informado" }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">3. CONDIÇÕES DO VEÍCULO NO ATO DA DEVOLUÇÃO</div>
+        <div class="info-row"><span class="label">Estado:</span> {{ devolucao.get_estado_veiculo_display }}</div>
+        <div class="info-row"><span class="label">Quilometragem:</span> {{ devolucao.km_atual|default:"Não informada" }} km</div>
+        <div class="info-row"><span class="label">Observações:</span> {{ devolucao.observacoes_veiculo|default:"Nenhuma" }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">4. DOCUMENTAÇÃO APRESENTADA</div>
+        <div class="info-row">{{ devolucao.documentos_apresentados }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">5. DADOS DA DEVOLUÇÃO</div>
+        <div class="info-row"><span class="label">Data:</span> {{ devolucao.data_devolucao|date:"d/m/Y" }}</div>
+        <div class="info-row"><span class="label">Hora:</span> {{ devolucao.hora_devolucao|time:"H:i" }}</div>
+        <div class="info-row"><span class="label">Responsável:</span> {{ devolucao.responsavel_devolucao.get_full_name|default:devolucao.responsavel_devolucao.username }}</div>
+    </div>
+    
+    {% if devolucao.observacoes_gerais %}
+    <div class="section">
+        <div class="section-title">6. OBSERVAÇÕES GERAIS</div>
+        <div class="info-row">{{ devolucao.observacoes_gerais }}</div>
+    </div>
+    {% endif %}
+    
+    <div class="assinaturas">
+        <table style="width: 100%; margin-top: 40px;">
+            <tr>
+                <td style="text-align: center; border: none;">
+                    <div class="linha-assinatura"></div>
+                    <strong>{{ devolucao.proprietario_nome }}</strong><br>
+                    Proprietário
+                </td>
+                <td style="text-align: center; border: none;">
+                    <div class="linha-assinatura"></div>
+                    <strong>{{ devolucao.responsavel_devolucao.get_full_name|default:devolucao.responsavel_devolucao.username }}</strong><br>
+                    Responsável pela Devolução
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="footer">
+        <p>Documento gerado eletronicamente em {{ devolucao.created_at|date:"d/m/Y H:i:s" }}</p>
+    </div>
+</body>
+</html>

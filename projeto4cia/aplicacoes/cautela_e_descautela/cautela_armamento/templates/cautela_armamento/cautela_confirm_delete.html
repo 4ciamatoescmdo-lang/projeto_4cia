@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Cautela #{{ cautela.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão</h4>
+                </div>
+                <div class="card-body">
+                    <p>Tem certeza que deseja excluir esta cautela?</p>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Cautela #{{ cautela.id }}</strong><br>
+                        <strong>Policial:</strong> {{ cautela.policial.nome_guerra }}<br>
+                        <strong>Data:</strong> {{ cautela.data_cautela|date:"d/m/Y H:i" }}<br>
+                        <strong>Status:</strong> 
+                        {% if cautela.status == 'ATIVA' %}
+                            <span class="badge bg-success">Ativa</span>
+                        {% elif cautela.status == 'DEVOLVIDA' %}
+                            <span class="badge bg-secondary">Devolvida</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-danger"><strong>Esta ação não poderá ser desfeita.</strong></p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>Sim, excluir
+                        </button>
+                        <a href="{% url 'cautela_armamento:cautela_detail' cautela.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

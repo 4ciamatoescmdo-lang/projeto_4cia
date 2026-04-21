@@ -1,0 +1,12 @@
+asgiref==3.11.1
+dj-database-url==2.1.0
+Django==6.0.4
+django-extensions==4.1
+packaging==26.1
+pillow==12.2.0
+psycopg2-binary==2.9.11
+python-dotenv==1.0.0
+setuptools==82.0.1
+sqlparse==0.5.5
+typing_extensions==4.15.0
+wheel==0.46.3

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Policiais Cadastrados{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-shield me-2"></i>Policiais</h1>
+        <a href="{% url 'cadastro_policiais:policial_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Novo Policial
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Patente</th>
+                            <th>Nome de Guerra</th>
+                            <th>Nome Completo</th>
+                            <th>Telefone</th>
+                            <th>Situação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for policial in policiais %}
+                        <tr>
+                            <td>{{ policial.matricula }}</td>
+                            <td>{{ policial.get_patente_display }}</td>
+                            <td>{{ policial.nome_guerra }}</td>
+                            <td>{{ policial.nome_completo }}</td>
+                            <td>{{ policial.telefone }}</td>
+                            <td>
+                                {% if policial.ativo %}
+                                    <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'cadastro_policiais:policial_detail' policial.pk %}" 
+                                   class="btn btn-sm btn-info" title="Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'cadastro_policiais:policial_update' policial.pk %}" 
+                                   class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'cadastro_policiais:policial_delete' policial.pk %}" 
+                                   class="btn btn-sm btn-danger" title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                Nenhum policial cadastrado.
+                                <a href="{% url 'cadastro_policiais:policial_create' %}">Cadastre o primeiro</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

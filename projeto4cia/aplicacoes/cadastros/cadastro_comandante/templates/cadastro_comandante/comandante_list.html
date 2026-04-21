@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Comandantes</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Patente</th><th>Nome</th><th>Data Nomeação</th><th>Ativo</th></tr>
+        </thead>
+        <tbody>
+            {% for comandante in comandantes %}
+            <tr>
+                <td>{{ comandante.get_patente_display }}</td>
+                <td>{{ comandante.nome_guerra|default:comandante.nome }}</td>
+                <td>{{ comandante.data_nomeacao }}</td>
+                <td>{% if comandante.ativo %}✅{% else %}❌{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

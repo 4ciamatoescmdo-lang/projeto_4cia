@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatório Analítico{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Cabeçalho Institucional -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-0">ESTADO DO MARANHÃO</h5>
+                    <h6 class="mb-0">SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h6>
+                    <h5 class="mb-0 mt-1">POLÍCIA MILITAR DO MARANHÃO</h5>
+                    <h6 class="mb-0">COMANDO DO POLICIAMENTO DO INTERIOR - CPI</h6>
+                    <h6 class="mb-0">COMANDO DO POLICIAMENTO DE ÁREA DO INTERIOR – CPA/I 04</h6>
+                    <h5 class="mt-2 mb-0">11º BATALHÃO DE POLÍCIA MILITAR – 4ª CIA MATOES</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Título do Relatório -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">RELATÓRIO ANALÍTICO Nº {{ relatorio_numero }} - 11º BPM/4ª CIA</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" id="relatorioForm" action="{% url 'relatorio_analitico:salvar_relatorio' %}">
+        {% csrf_token %}
+        
+        <!-- Campo hidden para o número do relatório -->
+        <input type="hidden" name="numero_relatorio" value="{{ relatorio_numero }}">
+        
+        <!-- DADOS INFORMATIVOS -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5><i class="fas fa-info-circle"></i> DADOS INFORMATIVOS</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label for="codigo_ocorrencia" class="form-label fw-bold">Código/Tipo da ocorrência</label>
+                            <input type="text" name="codigo_ocorrencia" id="codigo_ocorrencia" class="form-control" placeholder="Digite o código/tipo da ocorrência">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="local" class="form-label fw-bold">Local</label>
+                            <input type="text" name="local" id="local" class="form-control" placeholder="Endereço completo da ocorrência">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="data" class="form-label fw-bold">Data</label>
+                                <input type="date" name="data" id="data" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="hora" class="form-label fw-bold">Hora</label>
+                                <input type="time" name="hora" id="hora" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Pessoas Envolvidas</label>
+                            <div id="pessoas-list">
+                                <div class="pessoa-item card mb-2 p-3">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <select name="pessoa_tipo[]" class="form-control tipo-pessoa">
+                                                <option value="acusado">Acusado</option>
+                                                <option value="vitima">Vítima</option>
+                                                <option value="testemunha">Testemunha</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" name="pessoa_nome[]" class="form-control" placeholder="Nome completo">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" name="pessoa_cpf[]" class="form-control" placeholder="CPF">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" name="pessoa_rg[]" class="form-control" placeholder="RG">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" name="pessoa_endereco[]" class="form-control" placeholder="Endereço">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <input type="text" name="pessoa_mae[]" class="form-control" placeholder="Nome da mãe">
+                                                <button type="button" class="btn btn-danger remove-pessoa" style="display: none;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm mt-2" id="add-pessoa">
+                                <i class="fas fa-plus"></i> Adicionar pessoa
+                            </button>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="instrumento" class="form-label fw-bold">Instrumento usado</label>
+                            <input type="text" name="instrumento" id="instrumento" class="form-control" placeholder="Instrumento utilizado na ocorrência">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="materiais" class="form-label fw-bold">Materiais apreendidos</label>
+                            <textarea name="materiais" id="materiais" class="form-control" rows="3" placeholder="Armas, veículos, drogas, objetos etc..."></textarea>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Solução da ocorrência</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="evadiu" id="evadiu" value="sim">
+                                        <label class="form-check-label" for="evadiu">Evadiu-se do local</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="samu" id="samu" value="sim">
+                                        <label class="form-check-label" for="samu">SAMU acionado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="detido" id="detido" value="sim">
+                                        <label class="form-check-label" for="detido">Conduzido à Delegacia</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="viaturas" class="form-label fw-bold">Viaturas e guarnições envolvidas</label>
+                            <input type="text" name="viaturas" id="viaturas" class="form-control" placeholder="Ex: VTR 1234 - CB Silva, SD Santos">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RELATO DA OCORRÊNCIA -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-file-alt"></i> RELATO DA OCORRÊNCIA</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="relato" id="relato" class="form-control" rows="10" placeholder="Descreva detalhadamente o ocorrido..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROVIDÊNCIAS ADOTADAS -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-clipboard-list"></i> PROVIDÊNCIAS ADOTADAS</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="providencias" id="providencias" class="form-control" rows="6" placeholder="Descreva as providências adotadas pela guarnição..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Salvar Relatório
+                        </button>
+                        <a href="{% url 'relatorio_analitico:lista_relatorios' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pessoasList = document.getElementById('pessoas-list');
+    const addPessoaBtn = document.getElementById('add-pessoa');
+
+    function updateRemoveButtons() {
+        const items = document.querySelectorAll('.pessoa-item');
+        items.forEach((item, index) => {
+            const removeBtn = item.querySelector('.remove-pessoa');
+            if (items.length > 1) {
+                removeBtn.style.display = 'inline-block';
+                removeBtn.onclick = function(e) {
+                    e.preventDefault();
+                    item.remove();
+                    updateRemoveButtons();
+                };
+            } else {
+                removeBtn.style.display = 'none';
+            }
+        });
+    }
+
+    if (addPessoaBtn) {
+        addPessoaBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const newItem = document.createElement('div');
+            newItem.className = 'pessoa-item card mb-2 p-3';
+            newItem.innerHTML = `
+                <div class="row">
+                    <div class="col-md-2">
+                        <select name="pessoa_tipo[]" class="form-control tipo-pessoa">
+                            <option value="acusado">Acusado</option>
+                            <option value="vitima">Vítima</option>
+                            <option value="testemunha">Testemunha</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="pessoa_nome[]" class="form-control" placeholder="Nome completo">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="pessoa_cpf[]" class="form-control" placeholder="CPF">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="pessoa_rg[]" class="form-control" placeholder="RG">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="pessoa_endereco[]" class="form-control" placeholder="Endereço">
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <input type="text" name="pessoa_mae[]" class="form-control" placeholder="Nome da mãe">
+                            <button type="button" class="btn btn-danger remove-pessoa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            pessoasList.appendChild(newItem);
+            updateRemoveButtons();
+        });
+    }
+
+    updateRemoveButtons();
+});
+</script>
+
+<style>
+.card-header h5 {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.pessoa-item {
+    background-color: #f8f9fa;
+    transition: all 0.3s;
+}
+
+.pessoa-item:hover {
+    background-color: #e9ecef;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Permuta de Serviço</title>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: "Times New Roman", serif;
+            font-size: 12pt;
+            line-height: 1.4;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        /* LOGOS */
+        .logos-table {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .logos-table td {
+            width: 33.33%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .logos-table img {
+            max-height: 80px;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+        }
+
+        .header h4 {
+            margin: 2px 0;
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 2px 0;
+            font-size: 10pt;
+        }
+
+        /* TÍTULO */
+        .titulo {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            margin: 20px 0;
+            text-decoration: underline;
+        }
+
+        /* SEÇÕES */
+        .section {
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* TABELAS */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 6px;
+        }
+
+        /* ASSINATURAS */
+        .assinatura-table td {
+            border: none;
+            text-align: center;
+            padding-top: 40px;
+        }
+
+        .assinatura img {
+            max-height: 60px;
+        }
+
+        .linha {
+            border-top: 1px solid #000;
+            width: 80%;
+            margin: 10px auto;
+        }
+
+        /* RODAPÉ */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 10pt;
+        }
+
+        /* CONTROLE DE QUEBRA (PDF) */
+        .section, table {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- CABEÇALHO -->
+    <div class="header">
+
+        <table class="logos-table">
+            <tr>
+                <td>
+                    <img src="/static/escala_diaria/imagens/brasao_11bpm.png">
+                </td>
+                <td>
+                    <img src="/static/escala_diaria/imagens/brasao_estado.png">
+                </td>
+                <td>
+                    <img src="/static/escala_diaria/imagens/brasao_pmma.png">
+                </td>
+            </tr>
+        </table>
+
+        <h4>ESTADO DO MARANHÃO</h4>
+        <h4>SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h4>
+        <h4>POLÍCIA MILITAR DO MARANHÃO</h4>
+        <h4>COMANDO DO POLICIAMENTO DO INTERIOR - CPI</h4>
+        <h4>COMANDO DO POLICIAMENTO DE ÁREA DO INTERIOR – CPA/I 04</h4>
+        <h4>4ª CIA / 11º BATALHÃO DE POLÍCIA MILITAR</h4>
+
+        <p>Rua Timbiras n. 15 – Bairro Matadouro – CEP: 65645-000 – Matões/MA</p>
+        <p>Fone: (99) 98807-8369 | Email: 4ciamatoes@gmail.com</p>
+    </div>
+
+    <hr>
+
+    <!-- TÍTULO -->
+    <div class="titulo">
+        FORMULÁRIO PARA PERMUTA DE SERVIÇO
+    </div>
+
+    <!-- 1. DADOS -->
+    <div class="section">
+        <div class="section-title">1. DADOS DO SERVIDOR</div>
+
+        <table>
+            <tr>
+                <th>GRADUAÇÃO</th>
+                <th>MATRÍCULA</th>
+                <th>SUBUNIDADE</th>
+                <th>NOME</th>
+                <th>TELEFONE</th>
+            </tr>
+            <tr>
+                <td>1º SGT PM</td>
+                <td>1145036</td>
+                <td>4ª CIA / 11º BPM</td>
+                <td>P. MENEZES</td>
+                <td>(86) 98864-0222</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 2. DESTINO -->
+<div class="section-title">2. DESTINATÁRIO</div>
+<div class="section">
+    <table style="width: 100%; border-collapse: collapse; margin: 0 auto;">
+        <tr>
+            <td style="border: 1px solid #000; text-align: center; padding: 10px;">
+                <p style="margin: 5px 0 0 0;">4ª CIA / 11º BPM</p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+    <!-- 3. SOLICITAÇÃO -->
+    <div class="section">
+        <div class="section-title">3. SOLICITAÇÃO</div>
+        <p style="text-align: justify;">
+            Autorização para realização de permuta de serviço entre 
+            1º SGT PM P. MENEZES 
+            e 3º SGT PM ARAÚJO, 
+            referente ao serviço de , a ser cumprida
+
+
+    no horário das <strong>08:00h até às 08:00h</strong> do dia <strong>21/04/2026</strong>, sem prejuízo do serviço, pelo motivo <strong>PARTICULAR</strong>.
+
+
+        <p style="text-align: justify;">
+            <strong>Declaramos ter ciência do teor da portaria nº 002/2009 – P/1 do 11ºBPM, de 10 de setembro de 2009, publicada no BI
+nº 037 de 11 de setembro de 2009.</strong>
+            CONCORDAMOS, nestes termos:
+        </p>
+    </div>
+
+<table class="assinatura-table" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <td style="width: 50%; text-align: center; vertical-align: bottom; border: 1px solid #000; padding: 20px;">
+            
+                <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto 10px;"></div>
+            
+            <br>
+            <strong>1º SGT PM P. MENEZES</strong><br>
+            Solicitante
+        </td>
+        
+        <td style="width: 50%; text-align: center; vertical-align: bottom; border: 1px solid #000; padding: 20px;">
+            
+                <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto 10px;"></div>
+            
+            <br>
+            <strong>3º SGT PM ARAÚJO</strong><br>
+            Substituto
+        </td>
+    </tr>
+</table>
+
+    <!-- DESPACHO -->
+<div class="section">
+    <div class="section-title">4. DESPACHO</div>
+    <table style="width: 100%; border-collapse: collapse; margin: 10px 0 0 0; border: 1px solid #000;">
+        <tr>
+            <td style="text-align: center; padding: 15px; border: 1px solid #000;">
+                <p style="margin: 0; font-weight: bold;">Autorizado.</p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+    <!-- COMANDANTE -->
+    <div class="assinatura" style="text-align:center; margin-top:40px;">
+        
+            <div class="linha" style="width:200px;"></div>
+        
+        <br>
+        <strong>COMANDANTE</strong><br>
+        4ª CIA / 11º BPM
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="footer">
+        Matões/MA, 20/04/2026
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,508 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Sistema 4ª Cia{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .dashboard-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    .card-icon {
+        font-size: 2.5rem;
+        opacity: 0.3;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 20px 0;
+    }
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    .status-DISPONIVEL { background: #28a745; color: white; }
+    .status-EM_USO { background: #ffc107; color: #000; }
+    .status-MANUTENCAO { background: #fd7e14; color: white; }
+    .status-BAIXADO { background: #dc3545; color: white; }
+    .status-ATIVA { background: #007bff; color: white; }
+    .status-DEVOLVIDA { background: #6c757d; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6">
+                <i class="fas fa-chart-line me-2"></i>Dashboard 
+                <small class="text-muted">Sistema de Gestão - 4ª Cia</small>
+            </h1>
+            <p class="text-muted">Bem-vindo, {{ request.user.get_full_name|default:request.user.username }}!</p>
+        </div>
+    </div>
+
+    <!-- Cards Principais -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-users card-icon"></i>
+                    <h6 class="card-title">Policiais Ativos</h6>
+                    <h2 class="stat-number">{{ total_policiais }}</h2>
+                    <small>Total de policiais na ativa</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-gun card-icon"></i>
+                    <h6 class="card-title">Armamentos</h6>
+                    <h2 class="stat-number">{{ total_armamentos }}</h2>
+                    <small>Armamentos cadastrados</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-car card-icon"></i>
+                    <h6 class="card-title">Viaturas</h6>
+                    <h2 class="stat-number">{{ total_viaturas }}</h2>
+                    <small>Viaturas disponíveis</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card bg-warning text-dark">
+                <div class="card-body">
+                    <i class="fas fa-handcuffs card-icon"></i>
+                    <h6 class="card-title">Cautelas Ativas</h6>
+                    <h2 class="stat-number">{{ total_cautelas_ativas }}</h2>
+                    <small>Materiais cautelados</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card bg-danger text-white">
+                <div class="card-body">
+                    <i class="fas fa-truck card-icon"></i>
+                    <h6 class="card-title">Veículos Apreendidos</h6>
+                    <h2 class="stat-number">{{ total_apreendidos }}</h2>
+                    <small>Aguardando devolução</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card bg-secondary text-white">
+                <div class="card-body">
+                    <i class="fas fa-file-alt card-icon"></i>
+                    <h6 class="card-title">Relatórios (Mês)</h6>
+                    <h2 class="stat-number">{{ total_relatorios_mes }}</h2>
+                    <small>Ocorrências no mês</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Policiais por Patente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="policiaisPatenteChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Armamentos por Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="armamentosStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Armamentos por Tipo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="armamentosTipoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Viaturas por Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="viaturasStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabelas -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>Últimas Cautelas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Policial</th>
+                                    <th>Status</th>
+                                    <th>Previsão</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cautela in ultimas_cautelas %}
+                                <tr>
+                                    <td>{{ cautela.data_cautela|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ cautela.policial.nome_guerra }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ cautela.status }}">
+                                            {{ cautela.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cautela.data_prevista_devolucao|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Nenhuma cautela encontrada</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Escalas Recentes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Criado por</th>
+                                    <th>Visualizar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for escala in escalas_recentes %}
+                                <tr>
+                                    <td>{{ escala.data_escala|date:"d/m/Y" }}</td>
+                                    <td>{{ escala.criado_por.get_full_name|default:escala.criado_por.username }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" onclick="verEscala({{ escala.id }})">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Nenhuma escala encontrada</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Alertas de Estoque
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-bullseye me-2"></i>Munições com Estoque Baixo</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Calibre</th>
+                                            <th>Fabricante</th>
+                                            <th>Estoque</th>
+                                            <th>Mínimo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for municao in municoes_estoque_baixo %}
+                                        <tr class="table-warning">
+                                            <td>{{ municao.calibre }}</td>
+                                            <td>{{ municao.fabricante }}</td>
+                                            <td>{{ municao.quantidade }}</td>
+                                            <td>{{ municao.quantidade_minima }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Nenhuma munição com estoque baixo</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-boxes me-2"></i>Equipamentos com Estoque Baixo</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Equipamento</th>
+                                            <th>Categoria</th>
+                                            <th>Estoque</th>
+                                            <th>Mínimo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for equipamento in equipamentos_estoque_baixo %}
+                                        <tr class="table-warning">
+                                            <td>{{ equipamento.nome }}</td>
+                                            <td>{{ equipamento.get_categoria_display }}</td>
+                                            <td>{{ equipamento.quantidade }}</td>
+                                            <td>{{ equipamento.quantidade_minima }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Nenhum equipamento com estoque baixo</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Gráfico: Policiais por Patente
+const ctxPatente = document.getElementById('policiaisPatenteChart').getContext('2d');
+new Chart(ctxPatente, {
+    type: 'pie',
+    data: {
+        labels: {{ policiais_patente_labels|safe }},
+        datasets: [{
+            data: {{ policiais_patente_data|safe }},
+            backgroundColor: [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                '#858796', '#5a5c69', '#f6842d', '#6f42c1', '#20c997'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        let value = context.raw || 0;
+                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        let percentage = ((value / total) * 100).toFixed(1);
+                        return `${label}: ${value} (${percentage}%)`;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Gráfico: Armamentos por Status
+const ctxArmStatus = document.getElementById('armamentosStatusChart').getContext('2d');
+new Chart(ctxArmStatus, {
+    type: 'doughnut',
+    data: {
+        labels: {{ armamentos_status_labels|safe }},
+        datasets: [{
+            data: {{ armamentos_status_data|safe }},
+            backgroundColor: ['#28a745', '#ffc107', '#fd7e14', '#dc3545'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Gráfico: Armamentos por Tipo
+const ctxArmTipo = document.getElementById('armamentosTipoChart').getContext('2d');
+new Chart(ctxArmTipo, {
+    type: 'bar',
+    data: {
+        labels: {{ armamentos_tipo_labels|safe }},
+        datasets: [{
+            label: 'Quantidade',
+            data: {{ armamentos_tipo_data|safe }},
+            backgroundColor: '#4e73df',
+            borderColor: '#2c4cb5',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Gráfico: Viaturas por Status
+const ctxVtrStatus = document.getElementById('viaturasStatusChart').getContext('2d');
+new Chart(ctxVtrStatus, {
+    type: 'bar',
+    data: {
+        labels: {{ viaturas_status_labels|safe }},
+        datasets: [{
+            label: 'Quantidade',
+            data: {{ viaturas_status_data|safe }},
+            backgroundColor: '#36b9cc',
+            borderColor: '#258391',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Função para ver escala
+function verEscala(id) {
+    window.location.href = `/escala_diaria/detalhe/${id}/`;
+}
+
+// Auto-refresh a cada 30 segundos (opcional)
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

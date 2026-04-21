@@ -1,0 +1,1458 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Livro Diário - 4ª CIA/11º BPM{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- CABEÇALHO -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <img src="{% static 'livro_de_cautela/image.png' %}" alt="Logotipo" class="mb-4" width="150" height="auto">
+            <h4>ESTADO DO MARANHÃO</h4>
+            <h4>SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</h4>
+            <h4>POLÍCIA MILITAR DO MARANHÃO</h4>
+            <h4>COMANDO DO POLICIAMENTO DO INTERIOR - CPI</h4>
+            <h4>COMANDO DO POLICIAMENTO DE ÁREA DO INTERIOR – CPA/I 04</h4>
+            <h4>11º BATALHÃO DE POLÍCIA MILITAR – 4ª CIA MATÕES</h4>
+            <br>
+            <h1>LIVRO DIÁRIO</h1>
+            <br>
+        </div>
+    </div>
+
+    <!-- PARTE DIÁRIA -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">PARTE DIÁRIA</h5>
+                </div>
+                <div class="card-body">
+<p>
+    Parte diária do 
+    <strong>
+        {% if policial_logado %}
+            {{ policial_logado.get_patente_display }} {{ policial_logado.numero_barra }}/{{ policial_logado.barra }} {{ policial_logado.nome_guerra }}
+        {% else %}
+            {{ usuario.get_full_name|default:usuario.username }}
+        {% endif %}
+    </strong>,
+    de serviço de 24 horas do dia <strong>{{ dados.data_anterior|default:data_anterior }}</strong>
+    para o dia <strong>{{ dados.data_hoje|default:data_hoje }}</strong>,
+    ao Sr. Comandante da 4ª CIA/11º BPM <strong>{{ comandante_nome|default:comandante }}</strong>.
+</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. SERVIÇO INTERNO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">1. SERVIÇO INTERNO</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="bg-dark text-white p-2 rounded">PERMANÊNCIA</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Policial na Permanência</th>
+                                    <th>Permutou com</th>
+                                    <th>Serviço</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if dados.permanencias_lista %}
+                                    {% for item in dados.permanencias_lista %}
+                                    <tr>
+                                        <td>{{ item.policial }}</td>
+                                        <td>{{ item.permuta|default:"-" }}</td>
+                                        <td>{{ item.servico|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Nenhum registro de permanência</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="bg-dark text-white p-2 rounded mt-3">1.1. SERVIÇO EXTERNO</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Policial</th>
+                                    <th>Permuta</th>
+                                    <th>Turno</th>
+                                    <th>VTR</th>
+                                    <th>Função</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if dados.servicos_externos_lista %}
+                                    {% for item in dados.servicos_externos_lista %}
+                                    <tr>
+                                        <td>{{ item.policial }}</td>
+                                        <td>{{ item.permuta|default:"-" }}</td>
+                                        <td>{{ item.hora|default:"-" }}</td>
+                                        <td>{{ item.vtr|default:"-" }}</td>
+                                        <td>{{ item.funcao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Nenhum registro de serviço externo</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1.2 REMANEJAMENTO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">1.2. REMANEJAMENTO</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Situação:</strong> 
+                        <span class="badge 
+                            {% if dados.remanejamento_alteracao %}
+                                {% if 'com_alteracao' in dados.remanejamento_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                            {% else %}bg-success{% endif %}">
+                            {% if dados.remanejamento_alteracao %}
+                                {% if 'com_alteracao' in dados.remanejamento_alteracao|stringformat:'s'|lower %}
+                                    COM ALTERAÇÃO
+                                {% else %}
+                                    SEM ALTERAÇÃO
+                                {% endif %}
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        </span>
+                    </p>
+                    
+                    {% if dados.remanejamentos_lista and dados.remanejamentos_lista|length > 0 %}
+                        {% for item in dados.remanejamentos_lista %}
+                            {% if item.policial %}
+                            <div class="table-responsive mt-3">
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr><th>Policial</th><th>Posto Escalado</th><th>Posto Remanejado</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{ item.policial|default:"-" }}</td>
+                                            <td>{{ item.posto_escalado|default:"-" }}</td>
+                                            <td>{{ item.posto_remanejado|default:"-" }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- 1.3 DISPENSAS -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.3. DISPENSAS</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.dispensa_alteracao %}
+                            {% if 'com_alteracao' in dados.dispensa_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.dispensa_alteracao %}
+                            {% if 'com_alteracao' in dados.dispensa_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.dispensas_lista and dados.dispensas_lista|length > 0 %}
+                    {% for item in dados.dispensas_lista %}
+                        {% if item.policial %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Policial</th><th>Turno</th><th>Motivo</th><th>Observação</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.policial|default:"-" }}</td>
+                                        <td>{{ item.turno|default:"-" }}</td>
+                                        <td>{{ item.motivo|default:"-" }}</td>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.4 FALTAS -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.4. FALTAS</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.falta_alteracao %}
+                            {% if 'com_alteracao' in dados.falta_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.falta_alteracao %}
+                            {% if 'com_alteracao' in dados.falta_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.faltas_lista and dados.faltas_lista|length > 0 %}
+                    {% for item in dados.faltas_lista %}
+                        {% if item.policial %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Policial</th><th>Turno</th><th>Motivo</th><th>Observação</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.policial|default:"-" }}</td>
+                                        <td>{{ item.turno|default:"-" }}</td>
+                                        <td>{{ item.motivo|default:"-" }}</td>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.5 BAIXAS -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.5. BAIXAS</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.baixa_alteracao %}
+                            {% if 'com_alteracao' in dados.baixa_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.baixa_alteracao %}
+                            {% if 'com_alteracao' in dados.baixa_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.baixas_lista and dados.baixas_lista|length > 0 %}
+                    {% for item in dados.baixas_lista %}
+                        {% if item.policial %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Policial</th><th>Turno</th><th>Motivo</th><th>Observação</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.policial|default:"-" }}</td>
+                                        <td>{{ item.turno|default:"-" }}</td>
+                                        <td>{{ item.motivo|default:"-" }}</td>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.6 LIBERAÇÕES -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.6. LIBERAÇÕES</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.liberacao_alteracao %}
+                            {% if 'com_alteracao' in dados.liberacao_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.liberacao_alteracao %}
+                            {% if 'com_alteracao' in dados.liberacao_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.liberacoes_lista and dados.liberacoes_lista|length > 0 %}
+                    {% for item in dados.liberacoes_lista %}
+                        {% if item.policial %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Policial</th><th>Turno</th><th>Motivo</th><th>Observação</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.policial|default:"-" }}</td>
+                                        <td>{{ item.turno|default:"-" }}</td>
+                                        <td>{{ item.motivo|default:"-" }}</td>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.7 ATRASOS -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.7. ATRASOS</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.atraso_alteracao %}
+                            {% if 'com_alteracao' in dados.atraso_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.atraso_alteracao %}
+                            {% if 'com_alteracao' in dados.atraso_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.atrasos_lista and dados.atrasos_lista|length > 0 %}
+                    {% for item in dados.atrasos_lista %}
+                        {% if item.policial %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Policial</th><th>Observação</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.policial|default:"-" }}</td>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.8 ALTERAÇÕES NA VTR -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.8. ALTERAÇÕES NA VTR</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.viatura_alteracao %}
+                            {% if 'com_alteracao' in dados.viatura_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.viatura_alteracao %}
+                            {% if 'com_alteracao' in dados.viatura_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.viatura_alteracao and 'com_alteracao' in dados.viatura_alteracao|stringformat:'s'|lower %}
+                    {% if dados.viaturas_lista and dados.viaturas_lista|length > 0 %}
+                        {% for item in dados.viaturas_lista %}
+                            {% if item.vtr and item.vtr != '-' and item.vtr != 'None' and item.vtr|stringformat:'s' != '' %}
+                            <div class="table-responsive mt-3">
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr><th>VTR</th><th>Turno/Hora</th><th>Motorista</th><th>Problema</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{ item.vtr|default:"-" }}</td>
+                                            <td>{{ item.turno|default:"-" }}</td>
+                                            <td>{{ item.motorista|default:"-" }}</td>
+                                            <td>{{ item.problema|default:"SEM PROBLEMA" }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.9 BOLETIM DE OCORRÊNCIA -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.9. BOLETIM DE OCORRÊNCIA</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.boletim_ocorrencia_alteracao %}
+                            {% if 'com_alteracao' in dados.boletim_ocorrencia_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.boletim_ocorrencia_alteracao %}
+                            {% if 'com_alteracao' in dados.boletim_ocorrencia_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.boletins_lista and dados.boletins_lista|length > 0 %}
+                    {% for item in dados.boletins_lista %}
+                        {% if item.numero %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Nº do BO</th><th>Tipo Criminal</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.numero|default:"-" }}</td>
+                                        <td>{{ item.tipo|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 1.10 OCORRÊNCIA DE TRÂNSITO -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">1.10. OCORRÊNCIA DE TRÂNSITO</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Situação:</strong> 
+                    <span class="badge 
+                        {% if dados.ocorrencia_transito_alteracao %}
+                            {% if 'com_alteracao' in dados.ocorrencia_transito_alteracao|stringformat:'s'|lower %}bg-warning{% else %}bg-success{% endif %}
+                        {% else %}bg-success{% endif %}">
+                        {% if dados.ocorrencia_transito_alteracao %}
+                            {% if 'com_alteracao' in dados.ocorrencia_transito_alteracao|stringformat:'s'|lower %}
+                                COM ALTERAÇÃO
+                            {% else %}
+                                SEM ALTERAÇÃO
+                            {% endif %}
+                        {% else %}
+                            SEM ALTERAÇÃO
+                        {% endif %}
+                    </span>
+                </p>
+                
+                {% if dados.transitos_lista and dados.transitos_lista|length > 0 %}
+                    {% for item in dados.transitos_lista %}
+                        {% if item.ait or item.tcacp or item.frv %}
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>AIT</th><th>TCACP</th><th>FRV</th><th>ARV</th><th>CNH</th><th>CRLV</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ item.ait|default:"-" }}</td>
+                                        <td>{{ item.tcacp|default:"-" }}</td>
+                                        <td>{{ item.frv|default:"-" }}</td>
+                                        <td>{{ item.arv|default:"-" }}</td>
+                                        <td>{{ item.cnh|default:"-" }}</td>
+                                        <td>{{ item.crlv|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- 2. ENSINO E INSTRUÇÃO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">2. ENSINO E INSTRUÇÃO</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Ensino:</strong> 
+                        <span class="badge {% if dados.ensino_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ dados.ensino_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                        </span>
+                    </p>
+                    {% if dados.ensino_alteracao == 'com_alteracao' and dados.ensino_observacoes %}
+                        <div class="alert alert-info mt-2">{{ dados.ensino_observacoes }}</div>
+                    {% endif %}
+                    
+                    <p><strong>Instrução:</strong> 
+                        <span class="badge {% if dados.instrucao_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ dados.instrucao_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                        </span>
+                    </p>
+                    {% if dados.instrucao_alteracao == 'com_alteracao' and dados.instrucao_observacoes %}
+                        <div class="alert alert-info mt-2">{{ dados.instrucao_observacoes }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ASSUNTOS GERAIS E ADMINISTRATIVOS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">3. ASSUNTOS GERAIS E ADMINISTRATIVOS</h5>
+                </div>
+                <div class="card-body">
+                    <!-- 3.2 ABASTECIMENTO -->
+                    <div class="mb-3">
+                        <p><strong>Abastecimento:</strong> 
+                            <span class="badge {% if dados.km_litros_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.km_litros_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.km_litros_alteracao == 'com_alteracao' and dados.abastecimentos_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Viatura</th><th>KM</th><th>Litros</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.abastecimentos_lista %}
+                                    <tr>
+                                        <td>{{ item.viatura|default:"-" }}</td>
+                                        <td>{{ item.km|default:"-" }}</td>
+                                        <td>{{ item.litros|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 3.3 INSTALAÇÕES/MATERIAIS -->
+                    <div class="mb-3">
+                        <p><strong>Instalações/Materiais:</strong> 
+                            <span class="badge {% if dados.instalacoes_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.instalacoes_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.instalacoes_alteracao == 'com_alteracao' and dados.instalacoes_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Observações</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.instalacoes_lista %}
+                                    <tr>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 3.4 DOCUMENTAÇÃO RECEBIDA -->
+                    <div class="mb-3">
+                        <p><strong>Documentação Recebida:</strong> 
+                            <span class="badge {% if dados.documentacao_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.documentacao_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.documentacao_alteracao == 'com_alteracao' and dados.documentos_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Documento</th><th>Observações</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.documentos_lista %}
+                                    <tr>
+                                        <td>{{ item.documento|default:"-" }}</td>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 3.5 ASSUNTOS GERAIS -->
+                    <div class="mb-3">
+                        <p><strong>Assuntos Gerais:</strong> 
+                            <span class="badge {% if dados.assuntos_gerais_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.assuntos_gerais_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.assuntos_gerais_alteracao == 'com_alteracao' and dados.assuntos_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Assunto</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.assuntos_lista %}
+                                    <tr>
+                                        <td>{{ item.assunto|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. JUSTIÇA E DISCIPLINA -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">4. JUSTIÇA E DISCIPLINA</h5>
+                </div>
+                <div class="card-body">
+                    <!-- 4.1 CRIME COMUM -->
+                    <div class="mb-3">
+                        <p><strong>Crime Comum:</strong> 
+                            <span class="badge {% if dados.crime_comum_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.crime_comum_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.crime_comum_alteracao == 'com_alteracao' and dados.crime_comum_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Observações</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.crime_comum_lista %}
+                                    <tr>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 4.2 CRIME MILITAR -->
+                    <div class="mb-3">
+                        <p><strong>Crime Militar:</strong> 
+                            <span class="badge {% if dados.crime_militar_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.crime_militar_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.crime_militar_alteracao == 'com_alteracao' and dados.crime_militar_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Observações</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.crime_militar_lista %}
+                                    <tr>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 4.3 ALTERAÇÃO DE OFICIAL -->
+                    <div class="mb-3">
+                        <p><strong>Alteração de Oficial:</strong> 
+                            <span class="badge {% if dados.alteracao_oficial_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.alteracao_oficial_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.alteracao_oficial_alteracao == 'com_alteracao' and dados.alteracao_oficial_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Observações</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.alteracao_oficial_lista %}
+                                    <tr>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 4.4 ALTERAÇÃO DE PRAÇA -->
+                    <div class="mb-3">
+                        <p><strong>Alteração de Praça:</strong> 
+                            <span class="badge {% if dados.alteracao_praca_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ dados.alteracao_praca_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                            </span>
+                        </p>
+                        {% if dados.alteracao_praca_alteracao == 'com_alteracao' and dados.alteracao_praca_lista %}
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr><th>Observações</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in dados.alteracao_praca_lista %}
+                                    <tr>
+                                        <td>{{ item.observacao|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. ALTERAÇÕES DO SERVIÇO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">5. ALTERAÇÕES DO SERVIÇO</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Situação:</strong> 
+                        <span class="badge {% if dados.alteracoes_servico_alteracao == 'com_alteracao' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ dados.alteracoes_servico_alteracao|default:"SEM ALTERAÇÃO"|upper }}
+                        </span>
+                    </p>
+                    {% if dados.alteracoes_servico_alteracao == 'com_alteracao' and dados.alteracoes_servico_lista %}
+                        {% for item in dados.alteracoes_servico_lista %}
+                            <div class="alert alert-warning mt-2">{{ item.observacao|default:"-" }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. POLICIAL SUBSTITUTO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">6. POLICIAL SUBSTITUTO</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ dados.policial_substituto_nome|default:"NENHUM - PERMANEÇO NO SERVIÇO" }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSAGEM DE SERVIÇO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">7. PASSAGEM DE SERVIÇO</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p><strong>{{ dados.texto_passagem|default:"PERMANEÇO NO SERVIÇO DE 24 HORAS" }}</strong></p>
+                    <p>4ª CIA/11º BPM em Matões-MA, {{ dados.data_hoje|default:data_hoje }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASSINATURAS -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Comandante da GU</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if policial_logado and policial_logado.assinatura %}
+                                <img src="{{ policial_logado.assinatura.url }}" 
+                                     alt="Assinatura" 
+                                     style="max-width: 250px; max-height: 100px; border: 1px solid #ccc; padding: 5px;">
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Assinatura não cadastrada
+                                </div>
+                            {% endif %}
+                            <p class="mt-3">
+                                <strong>{{ policial_logado.get_patente_display }} {{ policial_logado.numero_barra }}/{{ policial_logado.barra }} {{ policial_logado.nome_guerra }}</strong><br>
+                                CMD DA GU
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Comandante da CIA</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if comandante and comandante.assinatura %}
+                                <img src="{{ comandante.assinatura.url }}" 
+                                     alt="Assinatura do Comandante" 
+                                     style="max-width: 250px; max-height: 100px; border: 1px solid #ccc; padding: 5px;">
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Assinatura não cadastrada
+                                </div>
+                            {% endif %}
+                            <p class="mt-3">
+                                <strong>{{ comandante.get_patente_display|default:"Comandante" }} {{ comandante.nome_guerra|default:"" }}</strong><br>
+                                CMT DA 4ª CIA/11º BPM
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÕES -->
+<!-- BOTÕES -->
+        <div class="row mt-4 mb-4">
+            <div class="col-12 text-center">
+                <button id="btnCopiarWhatsapp" class="btn btn-success btn-lg" style="background-color: #25D366; margin-right: 10px;">
+                    <i class="fab fa-whatsapp"></i> COPIAR PARA WHATSAPP
+                </button>
+                
+                <button class="btn btn-success" onclick="window.print()">
+                    <i class="fas fa-print"></i> IMPRIMIR
+                </button>
+                
+                <button class="btn btn-primary" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> VOLTAR
+                </button>
+            </div>
+        </div>
+
+</div>
+
+<style>
+@media print {
+    .btn {
+        display: none !important;
+    }
+    .card-header {
+        background-color: #f0f0f0 !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .badge {
+        border: 1px solid #000 !important;
+    }
+}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnCopiar = document.getElementById('btnCopiarWhatsapp');
+    
+    if (!btnCopiar) return;
+    
+    btnCopiar.addEventListener('click', function() {
+        // Coletar dados do HTML em vez de usar Django tags no JavaScript
+        const dados = {
+            policialNome: "{{ policial_logado.get_patente_display|default:'' }} {{ policial_logado.numero_barra|default:'' }}/{{ policial_logado.barra|default:'' }} {{ policial_logado.nome_guerra|default:'' }}".trim(),
+            dataAnterior: "{{ dados.data_anterior|default:data_anterior|default:'' }}",
+            dataHoje: "{{ dados.data_hoje|default:data_hoje|default:'' }}",
+            comandanteNome: "{{ comandante.get_patente_display|default:'' }} {{ comandante.nome_guerra|default:'' }}".trim(),
+            textoPassagem: "{{ dados.texto_passagem|default:'PERMANEÇO NO SERVIÇO DE 24 HORAS'|escapejs }}",
+            policialSubstituto: "{{ dados.policial_substituto_nome|default:'NENHUM - PERMANEÇO NO SERVIÇO'|escapejs }}"
+        };
+        
+        let mensagem = "";
+        
+        // ==================== CABEÇALHO ====================
+        mensagem += "🏛️ *POLÍCIA MILITAR DO MARANHÃO*\n";
+        mensagem += "🏢 *4ª CIA/11º BPM - MATÕES*\n";
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📋 *LIVRO DIÁRIO DE SERVIÇO*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        
+        // ==================== PARTE DIÁRIA ====================
+        mensagem += "👮 *PARTE DIÁRIA*\n";
+        mensagem += "─".repeat(40) + "\n";
+        mensagem += `📌 Policial: ${dados.policialNome}\n`;
+        mensagem += `📅 Período: ${dados.dataAnterior} → ${dados.dataHoje}\n`;
+        mensagem += `🎖️ Comandante: ${dados.comandanteNome}\n\n`;
+        
+        // ==================== 1. SERVIÇO INTERNO ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1. SERVIÇO INTERNO*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        
+        // PERMANÊNCIA
+        mensagem += "🔹 *PERMANÊNCIA*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.permanencias_lista %}
+            {% for item in dados.permanencias_lista %}
+                mensagem += `👮 {{ item.policial|escapejs }}\n`;
+                mensagem += `   🔄 Permuta: {{ item.permuta|default:'-'|escapejs }}\n`;
+                mensagem += `   ⚙️ Serviço: {{ item.servico|default:'-'|escapejs }}\n`;
+                mensagem += `   ───────────────────\n`;
+            {% endfor %}
+        {% else %}
+            mensagem += "   • Nenhum registro de permanência\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // SERVIÇO EXTERNO
+        mensagem += "🔹 *SERVIÇO EXTERNO (1.1)*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.servicos_externos_lista %}
+            {% for item in dados.servicos_externos_lista %}
+                mensagem += `👮 Policial: {{ item.policial|escapejs }}\n`;
+                mensagem += `   🔄 Permuta: {{ item.permuta|default:'-'|escapejs }}\n`;
+                mensagem += `   ⏰ Turno: {{ item.hora|default:'-'|escapejs }}\n`;
+                mensagem += `   🚓 VTR: {{ item.vtr|default:'-'|escapejs }}\n`;
+                mensagem += `   📋 Função: {{ item.funcao|default:'-'|escapejs }}\n`;
+                mensagem += `   ───────────────────\n`;
+            {% endfor %}
+        {% else %}
+            mensagem += "   • Nenhum registro de serviço externo\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // REMANEJAMENTO
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.2. REMANEJAMENTO*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.remanejamento_alteracao and 'com_alteracao' in dados.remanejamento_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.remanejamentos_lista %}
+                {% for item in dados.remanejamentos_lista %}
+                    mensagem += `👮 Policial: {{ item.policial|default:'-'|escapejs }}\n`;
+                    mensagem += `   📌 Posto Escalado: {{ item.posto_escalado|default:'-'|escapejs }}\n`;
+                    mensagem += `   🔄 Posto Remanejado: {{ item.posto_remanejado|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // DISPENSAS
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.3. DISPENSAS*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.dispensa_alteracao and 'com_alteracao' in dados.dispensa_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.dispensas_lista %}
+                {% for item in dados.dispensas_lista %}
+                    mensagem += `👮 Policial: {{ item.policial|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⏰ Turno: {{ item.turno|default:'-'|escapejs }}\n`;
+                    mensagem += `   📝 Motivo: {{ item.motivo|default:'-'|escapejs }}\n`;
+                    mensagem += `   📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // FALTAS
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.4. FALTAS*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.falta_alteracao and 'com_alteracao' in dados.falta_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.faltas_lista %}
+                {% for item in dados.faltas_lista %}
+                    mensagem += `👮 Policial: {{ item.policial|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⏰ Turno: {{ item.turno|default:'-'|escapejs }}\n`;
+                    mensagem += `   📝 Motivo: {{ item.motivo|default:'-'|escapejs }}\n`;
+                    mensagem += `   📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // BAIXAS
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.5. BAIXAS*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.baixa_alteracao and 'com_alteracao' in dados.baixa_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.baixas_lista %}
+                {% for item in dados.baixas_lista %}
+                    mensagem += `👮 Policial: {{ item.policial|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⏰ Turno: {{ item.turno|default:'-'|escapejs }}\n`;
+                    mensagem += `   📝 Motivo: {{ item.motivo|default:'-'|escapejs }}\n`;
+                    mensagem += `   📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // LIBERAÇÕES
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.6. LIBERAÇÕES*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.liberacao_alteracao and 'com_alteracao' in dados.liberacao_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.liberacoes_lista %}
+                {% for item in dados.liberacoes_lista %}
+                    mensagem += `👮 Policial: {{ item.policial|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⏰ Turno: {{ item.turno|default:'-'|escapejs }}\n`;
+                    mensagem += `   📝 Motivo: {{ item.motivo|default:'-'|escapejs }}\n`;
+                    mensagem += `   📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ATRASOS
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.7. ATRASOS*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.atraso_alteracao and 'com_alteracao' in dados.atraso_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.atrasos_lista %}
+                {% for item in dados.atrasos_lista %}
+                    mensagem += `👮 Policial: {{ item.policial|default:'-'|escapejs }}\n`;
+                    mensagem += `   📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ALTERAÇÕES NA VTR
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.8. ALTERAÇÕES NA VTR*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.viatura_alteracao and 'com_alteracao' in dados.viatura_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.viaturas_lista %}
+                {% for item in dados.viaturas_lista %}
+                    mensagem += `🚓 VTR: {{ item.vtr|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⏰ Turno: {{ item.turno|default:'-'|escapejs }}\n`;
+                    mensagem += `   👮 Motorista: {{ item.motorista|default:'-'|escapejs }}\n`;
+                    mensagem += `   🔧 Problema: {{ item.problema|default:'SEM PROBLEMA'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // BOLETIM DE OCORRÊNCIA
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.9. BOLETIM DE OCORRÊNCIA*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.boletim_ocorrencia_alteracao and 'com_alteracao' in dados.boletim_ocorrencia_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.boletins_lista %}
+                {% for item in dados.boletins_lista %}
+                    mensagem += `📄 Nº do BO: {{ item.numero|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⚠️ Tipo Criminal: {{ item.tipo|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // OCORRÊNCIA DE TRÂNSITO
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📌 *1.10. OCORRÊNCIA DE TRÂNSITO*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.ocorrencia_transito_alteracao and 'com_alteracao' in dados.ocorrencia_transito_alteracao|stringformat:'s'|lower %}
+            mensagem += "✅ *COM ALTERAÇÃO*\n";
+            {% if dados.transitos_lista %}
+                {% for item in dados.transitos_lista %}
+                    mensagem += `📝 AIT: {{ item.ait|default:'-'|escapejs }}\n`;
+                    mensagem += `📝 TCACP: {{ item.tcacp|default:'-'|escapejs }}\n`;
+                    mensagem += `📝 FRV: {{ item.frv|default:'-'|escapejs }}\n`;
+                    mensagem += `📝 ARV: {{ item.arv|default:'-'|escapejs }}\n`;
+                    mensagem += `📝 CNH: {{ item.cnh|default:'-'|escapejs }}\n`;
+                    mensagem += `📝 CRLV: {{ item.crlv|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ *SEM ALTERAÇÃO*\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ==================== 2. ENSINO E INSTRUÇÃO ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📚 *2. ENSINO E INSTRUÇÃO*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        
+        mensagem += "📖 *ENSINO*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.ensino_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.ensino_observacoes %}
+                mensagem += `📝 Observações: {{ dados.ensino_observacoes|escapejs }}\n`;
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        mensagem += "🎯 *INSTRUÇÃO*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.instrucao_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.instrucao_observacoes %}
+                mensagem += `📝 Observações: {{ dados.instrucao_observacoes|escapejs }}\n`;
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ==================== 3. ASSUNTOS GERAIS ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📄 *3. ASSUNTOS GERAIS E ADMINISTRATIVOS*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        
+        // ABASTECIMENTO
+        mensagem += "⛽ *ABASTECIMENTO*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.km_litros_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.abastecimentos_lista %}
+                {% for item in dados.abastecimentos_lista %}
+                    mensagem += `🚓 Viatura: {{ item.viatura|default:'-'|escapejs }}\n`;
+                    mensagem += `   📊 KM: {{ item.km|default:'-'|escapejs }}\n`;
+                    mensagem += `   ⛽ Litros: {{ item.litros|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // INSTALAÇÕES/MATERIAIS
+        mensagem += "🔧 *INSTALAÇÕES/MATERIAIS*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.instalacoes_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.instalacoes_lista %}
+                {% for item in dados.instalacoes_lista %}
+                    mensagem += `📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // DOCUMENTAÇÃO RECEBIDA
+        mensagem += "📄 *DOCUMENTAÇÃO RECEBIDA*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.documentacao_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.documentos_lista %}
+                {% for item in dados.documentos_lista %}
+                    mensagem += `📑 Documento: {{ item.documento|default:'-'|escapejs }}\n`;
+                    mensagem += `   📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ASSUNTOS GERAIS
+        mensagem += "📋 *ASSUNTOS GERAIS*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.assuntos_gerais_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.assuntos_lista %}
+                {% for item in dados.assuntos_lista %}
+                    mensagem += `📌 Assunto: {{ item.assunto|default:'-'|escapejs }}\n`;
+                    mensagem += `   ───────────────────\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ==================== 4. JUSTIÇA E DISCIPLINA ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "⚖️ *4. JUSTIÇA E DISCIPLINA*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        
+        mensagem += "🔫 *CRIME COMUM*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.crime_comum_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.crime_comum_lista %}
+                {% for item in dados.crime_comum_lista %}
+                    mensagem += `📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        mensagem += "⚔️ *CRIME MILITAR*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.crime_militar_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.crime_militar_lista %}
+                {% for item in dados.crime_militar_lista %}
+                    mensagem += `📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        mensagem += "🎖️ *ALTERAÇÃO DE OFICIAL*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.alteracao_oficial_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.alteracao_oficial_lista %}
+                {% for item in dados.alteracao_oficial_lista %}
+                    mensagem += `📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        mensagem += "🪖 *ALTERAÇÃO DE PRAÇA*\n";
+        mensagem += "─".repeat(30) + "\n";
+        {% if dados.alteracao_praca_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.alteracao_praca_lista %}
+                {% for item in dados.alteracao_praca_lista %}
+                    mensagem += `📋 Observação: {{ item.observacao|default:'-'|escapejs }}\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ==================== 5. ALTERAÇÕES DO SERVIÇO ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "🔄 *5. ALTERAÇÕES DO SERVIÇO*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        
+        {% if dados.alteracoes_servico_alteracao == 'com_alteracao' %}
+            mensagem += "✅ COM ALTERAÇÃO\n";
+            {% if dados.alteracoes_servico_lista %}
+                {% for item in dados.alteracoes_servico_lista %}
+                    mensagem += `📝 {{ item.observacao|default:'-'|escapejs }}\n`;
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            mensagem += "❌ SEM ALTERAÇÃO\n";
+        {% endif %}
+        mensagem += "\n";
+        
+        // ==================== 6. POLICIAL SUBSTITUTO ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "👥 *6. POLICIAL SUBSTITUTO*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        mensagem += `👮 ${dados.policialSubstituto}\n\n`;
+        
+        // ==================== 7. PASSAGEM DE SERVIÇO ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📝 *7. PASSAGEM DE SERVIÇO*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        mensagem += `💬 "${dados.textoPassagem}"\n\n`;
+        mensagem += `📍 4ª CIA/11º BPM em Matões-MA, ${dados.dataHoje}\n\n`;
+        
+        // ==================== ASSINATURAS ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "✍️ *ASSINATURAS*\n";
+        mensagem += "=".repeat(50) + "\n\n";
+        mensagem += `👮 **Comandante da GU**\n`;
+        mensagem += `${dados.policialNome}\n\n`;
+        mensagem += `🎖️ **Comandante da CIA**\n`;
+        mensagem += `${dados.comandanteNome}\n\n`;
+        
+        // ==================== RODAPÉ ====================
+        mensagem += "=".repeat(50) + "\n";
+        mensagem += "📱 *Relatório gerado automaticamente pelo sistema*\n";
+        mensagem += `📅 Gerado em: ${new Date().toLocaleString('pt-BR')}\n`;
+        mensagem += "=".repeat(50);
+        
+        // Copiar para área de transferência
+        const btn = document.getElementById('btnCopiarWhatsapp');
+        const originalText = btn.innerHTML;
+        
+        navigator.clipboard.writeText(mensagem).then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> COPIADO!';
+            btn.style.backgroundColor = '#128C7E';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = '#25D366';
+            }, 3000);
+            alert('✅ Relatório completo copiado para área de transferência!\n\nAgora cole (Ctrl+V) no WhatsApp.');
+        }).catch((err) => {
+            console.error('Erro ao copiar:', err);
+            alert('❌ Erro ao copiar. Tente novamente.\n\nSe o erro persistir, use Ctrl+C manualmente.');
+            btn.innerHTML = originalText;
+            btn.style.backgroundColor = '#25D366';
+        });
+    });
+});
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

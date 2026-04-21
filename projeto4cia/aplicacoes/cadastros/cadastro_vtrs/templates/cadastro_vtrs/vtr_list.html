@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Viaturas Cadastradas{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-truck me-2"></i>Viaturas (VTRs)</h1>
+        <a href="{% url 'cadastro_vtrs:vtr_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nova Viatura
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Prefixo</th>
+                            <th>Placa</th>
+                            <th>Tipo</th>
+                            <th>Marca/Modelo</th>
+                            <th>Ano</th>
+                            <th>KM</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for viatura in viaturas %}
+                        <tr>
+                            <td><strong>{{ viatura.prefixo }}</strong></td>
+                            <td>{{ viatura.placa }}</td>
+                            <td>{{ viatura.get_tipo_display }}</td>
+                            <td>{{ viatura.marca }} {{ viatura.modelo }}</td>
+                            <td>{{ viatura.ano }}</td>
+                            <td>{{ viatura.km_atual|default:'0' }} km</td>
+                            <td>
+                                {% if viatura.status == 'DISPONIVEL' %}
+                                    <span class="badge bg-success">Disponível</span>
+                                {% elif viatura.status == 'EM_USO' %}
+                                    <span class="badge bg-warning">Em Uso</span>
+                                {% elif viatura.status == 'MANUTENCAO' %}
+                                    <span class="badge bg-danger">Em Manutenção</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Baixada</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'cadastro_vtrs:vtr_detail' viatura.pk %}" 
+                                   class="btn btn-sm btn-info" title="Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'cadastro_vtrs:vtr_update' viatura.pk %}" 
+                                   class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'cadastro_vtrs:vtr_delete' viatura.pk %}" 
+                                   class="btn btn-sm btn-danger" title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                Nenhuma viatura cadastrada.
+                                <a href="{% url 'cadastro_vtrs:vtr_create' %}">Cadastre a primeira</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,761 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Livro de Cautela{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Livro de Cautela</h1>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <button id="gerarRelatorioBtn" class="btn btn-primary btn-lg">
+                <i class="fas fa-file-alt"></i> Gerar Relatório
+            </button>
+            <button id="listarRelatoriosBtn" class="btn btn-info btn-lg">
+                <i class="fas fa-list"></i> Listar Relatórios Salvos
+            </button>
+        </div>
+    </div>
+
+    <!-- Formulário de seleção -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5>Selecionar Policial e Observações</h5>
+                </div>
+                <div class="card-body">
+                    <form id="formRelatorio" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="policial">Escolha o Policial Substituto:</label>
+                            <select name="policial" id="policial" class="form-control">
+                                <option value="">-- Selecione um policial --</option>
+                                {% for policial_item in policial %}
+                                <option value="{{ policial_item.id }}">
+                                    {{ policial_item }}  <!-- ← USA O MÉTODO __str__ DO MODELO -->
+                                </option>
+                                {% empty %}
+                                <option value="">Nenhum policial encontrado</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo_alteracao">Tipo de Alteração:</label>
+                            <select name="tipo_alteracao" id="tipo_alteracao" class="form-control">
+                                <option value="">-- Selecione o tipo de alteração --</option>
+                                <option value="SEM ALTERAÇÃO">SEM ALTERAÇÃO</option>
+                                <option value="COM ALTERAÇÃO">COM ALTERAÇÃO</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="observacoes">Observações:</label>
+                            <textarea name="observacoes" id="observacoes" class="form-control" rows="4" placeholder="Escreva suas observações aqui..."></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELA 1: ITENS AINDA CAUTELADOS (NÃO DEVOLVIDOS) -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center mb-3">ITENS AINDA CAUTELADOS</h2>
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5>ITENS AINDA CAUTELADOS (NÃO DEVOLVIDOS)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Policial</th>
+                                    <th>Tipo</th>
+                                    <th>Nº Série</th>
+                                    <th>Armeiro</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Calibre</th>
+                                    <th>Quantidade</th>
+                                    <th>Data Cautela</th>
+                                    <th>Situação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in itens_nao_devolvidos %}
+                                <tr>
+                                    <td>{{ item.cautela.policial.nome_guerra }}</td>
+                                    
+                                    <!-- Tipo do Item -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            Armamento
+                                        {% elif item.municao %}
+                                            Munição
+                                        {% elif item.equipamento %}
+                                            Equipamento
+                                        {% elif item.eletronico %}
+                                            Eletrônico
+                                        {% elif item.viatura %}
+                                            Viatura
+                                        {% else %}
+                                            Outro
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Nº Série -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.numero_serie }}
+                                        {% elif item.equipamento %}
+                                            {{ item.equipamento.numero_serie|default:"-" }}
+                                        {% elif item.eletronico %}
+                                            {{ item.eletronico.numero_serie }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- ARMEIRO -->
+                                    <td>
+                                        {% if item.cautela.criado_por %}
+                                            {{ item.cautela.criado_por.get_full_name|default:item.cautela.criado_por.username }}
+                                        {% else %}
+                                            <span class="text-muted">Não informado</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Marca / Fabricante -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.marca }}
+                                        {% elif item.municao %}
+                                            {{ item.municao.fabricante }}
+                                        {% elif item.equipamento %}
+                                            {{ item.equipamento.marca }}
+                                        {% elif item.eletronico %}
+                                            {{ item.eletronico.marca }}
+                                        {% elif item.viatura %}
+                                            {{ item.viatura.marca }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Modelo -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.modelo }}
+                                        {% elif item.municao %}
+                                            {{ item.municao.modelo }}
+                                        {% elif item.equipamento %}
+                                            {{ item.equipamento.modelo }}
+                                        {% elif item.eletronico %}
+                                            {{ item.eletronico.modelo }}
+                                        {% elif item.viatura %}
+                                            {{ item.viatura.modelo }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Calibre -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.calibre }}
+                                        {% elif item.municao %}
+                                            {{ item.municao.calibre }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Quantidade -->
+                                    <td>
+                                        {% if item.municao %}
+                                            {{ item.quantidade_municao }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Data Cautela -->
+                                    <td>{{ item.cautela.data_cautela|date:"d/m/Y H:i" }}</td>
+                                    
+                                    <!-- Situação -->
+                                    <td>
+                                        <span class="badge bg-warning">Não Devolvido</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">Nenhum item cautelado no momento</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELA 2: ITENS DESCAUTELADOS NESTA DATA -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5>ITENS DESCAUTELADOS NESTA DATA</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Policial</th>
+                                    <th>Tipo</th>
+                                    <th>Nº Série</th>
+                                    <th>Armeiro</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Calibre</th>
+                                    <th>Quantidade</th>
+                                    <th>Data Devolução</th>
+                                    <th>Situação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in itens_devolvidos_hoje %}
+                                <tr>
+                                    <td>{{ item.cautela.policial.nome_guerra }}</td>
+                                    
+                                    <!-- Tipo do Item -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            Armamento
+                                        {% elif item.municao %}
+                                            Munição
+                                        {% elif item.equipamento %}
+                                            Equipamento
+                                        {% elif item.eletronico %}
+                                            Eletrônico
+                                        {% elif item.viatura %}
+                                            Viatura
+                                        {% else %}
+                                            Outro
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Nº Série -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.numero_serie }}
+                                        {% elif item.equipamento %}
+                                            {{ item.equipamento.numero_serie|default:"-" }}
+                                        {% elif item.eletronico %}
+                                            {{ item.eletronico.numero_serie }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- ARMEIRO -->
+                                    <td>
+                                        {% if item.cautela.criado_por %}
+                                            {{ item.cautela.criado_por.get_full_name|default:item.cautela.criado_por.username }}
+                                        {% else %}
+                                            <span class="text-muted">Não informado</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Marca / Fabricante -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.marca }}
+                                        {% elif item.municao %}
+                                            {{ item.municao.fabricante }}
+                                        {% elif item.equipamento %}
+                                            {{ item.equipamento.marca }}
+                                        {% elif item.eletronico %}
+                                            {{ item.eletronico.marca }}
+                                        {% elif item.viatura %}
+                                            {{ item.viatura.marca }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Modelo -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.modelo }}
+                                        {% elif item.municao %}
+                                            {{ item.municao.modelo }}
+                                        {% elif item.equipamento %}
+                                            {{ item.equipamento.modelo }}
+                                        {% elif item.eletronico %}
+                                            {{ item.eletronico.modelo }}
+                                        {% elif item.viatura %}
+                                            {{ item.viatura.modelo }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Calibre -->
+                                    <td>
+                                        {% if item.armamento %}
+                                            {{ item.armamento.calibre }}
+                                        {% elif item.municao %}
+                                            {{ item.municao.calibre }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Quantidade -->
+                                    <td>
+                                        {% if item.municao %}
+                                            {{ item.quantidade_municao }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Data Devolução -->
+                                    <td>{{ item.data_devolucao_item|date:"d/m/Y H:i" }}</td>
+                                    
+                                    <!-- Situação -->
+                                    <td><span class="badge bg-success">Devolvido</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">Nenhum item descautelado hoje</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exibir armamentos cautelados -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Armamentos Disponivel na Reserva</h5>
+                </div>
+                <div class="card-body">
+                    <table id="armamentos_table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Número de Série</th>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Calibre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for armamento in armamentos_cautelados %}
+                            <tr>
+                                <td>{{ armamento.id }}</td>
+                                <td>{{ armamento.numero_serie }}</td>
+                                <td>{{ armamento.tipo }}</td>
+                                <td>{{ armamento.marca }}</td>
+                                <td>{{ armamento.modelo }}</td>
+                                <td>{{ armamento.calibre }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center">Nenhum armamento cautelado encontrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Exibir munições cauteladas -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>Munições Disponivel na Reserva</h5>
+            </div>
+            <div class="card-body">
+                <table id="municoes_table" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Calibre</th>
+                            <th>Fabricante</th>
+                            <th>Modelo</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for municao in municoes_cauteladas %}
+                        <tr>
+                            <td>{{ municao.id }}</td>
+                            <td>{{ municao.calibre }}</td>
+                            <td>{{ municao.fabricante }}</td>
+                            <td>{{ municao.modelo }}</td>
+                            <td>{{ municao.quantidade_disponivel }}</td>  <!-- ← ALTERADO AQUI -->
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center">Nenhuma munição encontrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Exibir equipamentos cautelados -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Equipamentos Disponivel na Reserva</h5>
+                </div>
+                <div class="card-body">
+                    <table id="equipamentos_table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipamento in equipamentos_cautelados %}
+                            <tr>
+                                <td>{{ equipamento.id }}</td>
+                                <td>{{ equipamento.nome }}</td>
+                                <td>{{ equipamento.descricao }}</td>
+                                <td>{{ equipamento.categoria }}</td>
+                                <td>{{ equipamento.marca }}</td>
+                                <td>{{ equipamento.modelo }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center">Nenhum equipamento cautelado encontrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exibir eletrônicos cautelados -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Eletrônicos Disponivel na Reserva</h5>
+                </div>
+                <div class="card-body">
+                    <table id="eletronicos_table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Número de Série</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for eletronico in eletronicos_cautelados %}
+                            <tr>
+                                <td>{{ eletronico.id }}</td>
+                                <td>{{ eletronico.tipo }}</td>
+                                <td>{{ eletronico.marca }}</td>
+                                <td>{{ eletronico.modelo }}</td>
+                                <td>{{ eletronico.numero_serie }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center">Nenhum eletrônico cautelado encontrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exibir viaturas cauteladas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Viaturas Disponivel</h5>
+                </div>
+                <div class="card-body">
+                    <table id="viaturas_table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Prefixo</th>
+                                <th>Placa</th>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vtr in vtrs_cautelados %}
+                            <tr>
+                                <td>{{ vtr.id }}</td>
+                                <td>{{ vtr.prefixo }}</td>
+                                <td>{{ vtr.placa }}</td>
+                                <td>{{ vtr.tipo }}</td>
+                                <td>{{ vtr.marca }}</td>
+                                <td>{{ vtr.modelo }}</td>
+                            </tr>
+                            {% empty %}
+                            <td><td colspan="6" class="text-center">Nenhuma viatura cautelada encontrada.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exibir veículos apreendidos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Veículos Apreendidos</h5>
+                </div>
+                <div class="card-body">
+                    <table id="veiculo_apreendido_table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Placa</th>
+                                <th>Modelo</th>
+                                <th>Cor</th>
+                                <th>Ano</th>
+                                <th>Data da Apreensão</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for veiculo in veiculos_apreendidos %}
+                            <tr>
+                                <td>{{ veiculo.id }}</td>
+                                <td>{{ veiculo.placa }}</td>
+                                <td>{{ veiculo.modelo }}</td>
+                                <td>{{ veiculo.cor }}</td>
+                                <td>{{ veiculo.ano }}</td>
+                                <td>{{ veiculo.data_apreensao }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center">Nenhum veículo apreendido encontrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para listar relatórios salvos -->
+<div class="modal fade" id="relatoriosModal" tabindex="-1" aria-labelledby="relatoriosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="relatoriosModalLabel">Relatórios Salvos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body" id="relatoriosList">
+                <p>Carregando...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('gerarRelatorioBtn').addEventListener('click', function() {
+    const policialId = document.getElementById('policial').value;
+    const observacoes = document.getElementById('observacoes').value;
+    const tipoAlteracao = document.getElementById('tipo_alteracao').value;
+    
+    if (!policialId) {
+        alert('Por favor, selecione um policial.');
+        return;
+    }
+    
+    if (!tipoAlteracao) {
+        alert('Por favor, selecione o tipo de alteração.');
+        return;
+    }
+    
+    const dados = {
+        policial_id: policialId,
+        observacoes: observacoes,
+        tipo_alteracao: tipoAlteracao,
+        armamentos: [
+            {% for a in armamentos_cautelados %}
+            {
+                id: {{ a.id|safe }},
+                numero_serie: "{{ a.numero_serie|escapejs }}",
+                tipo: "{{ a.tipo|escapejs }}",
+                marca: "{{ a.marca|escapejs }}",
+                modelo: "{{ a.modelo|escapejs }}",
+                calibre: "{{ a.calibre|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        municoes: [
+            {% for m in municoes_cauteladas %}
+            {
+                id: {{ m.id|safe }},
+                calibre: "{{ m.calibre|escapejs }}",
+                fabricante: "{{ m.fabricante|escapejs }}",
+                modelo: "{{ m.modelo|escapejs }}",
+                quantidade: {{ m.quantidade|safe }}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        equipamentos: [
+            {% for e in equipamentos_cautelados %}
+            {
+                id: {{ e.id|safe }},
+                nome: "{{ e.nome|escapejs }}",
+                descricao: "{{ e.descricao|escapejs }}",
+                categoria: "{{ e.categoria|escapejs }}",
+                marca: "{{ e.marca|escapejs }}",
+                modelo: "{{ e.modelo|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        eletronicos: [
+            {% for e in eletronicos_cautelados %}
+            {
+                id: {{ e.id|safe }},
+                tipo: "{{ e.tipo|escapejs }}",
+                marca: "{{ e.marca|escapejs }}",
+                modelo: "{{ e.modelo|escapejs }}",
+                numero_serie: "{{ e.numero_serie|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        viaturas: [
+            {% for v in vtrs_cautelados %}
+            {
+                id: {{ v.id|safe }},
+                prefixo: "{{ v.prefixo|escapejs }}",
+                placa: "{{ v.placa|escapejs }}",
+                tipo: "{{ v.tipo|escapejs }}",
+                marca: "{{ v.marca|escapejs }}",
+                modelo: "{{ v.modelo|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        veiculos: [
+            {% for v in veiculos_apreendidos %}
+            {
+                id: {{ v.id|safe }},
+                placa: "{{ v.placa|escapejs }}",
+                modelo: "{{ v.modelo|escapejs }}",
+                cor: "{{ v.cor|escapejs }}",
+                ano: {{ v.ano|safe }},
+                data_apreensao: "{{ v.data_apreensao|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    };
+    
+    console.log('Enviando dados:', JSON.stringify(dados, null, 2));
+    
+    fetch('{% url "livro_de_cautela:gerar_relatorio" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Resposta de erro do servidor:', errorText);
+            throw new Error(`Erro ${response.status}: ${errorText.substring(0, 200)}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Resposta:', data);
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Erro ao gerar relatório: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro detalhado:', error);
+        alert('Erro ao gerar relatório. Verifique o console para mais detalhes (F12).');
+    });
+});
+
+document.getElementById('listarRelatoriosBtn').addEventListener('click', function() {
+    fetch('{% url "livro_de_cautela:listar_relatorios" %}')
+    .then(response => response.json())
+    .then(data => {
+        let html = '<ul class="list-group">';
+        data.relatorios.forEach(relatorio => {
+            html += `
+                <li class="list-group-item">
+                    <strong>Relatório #${relatorio.id}</strong> - 
+                    ${relatorio.data_criacao} - 
+                    Policial: ${relatorio.policial_nome}
+                    ${relatorio.tipo_alteracao ? `- <span class="badge ${relatorio.tipo_alteracao === 'COM ALTERAÇÃO' ? 'badge-warning' : 'badge-success'}">${relatorio.tipo_alteracao}</span>` : ''}
+                    <div class="float-right">
+                        <a href="/livros/cautela/relatorio/${relatorio.id}/" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                    </div>
+                </li>
+            `;
+        });
+        html += '</ul>';
+        
+        if (data.relatorios.length === 0) {
+            html = '<p class="text-center">Nenhum relatório salvo encontrado.</p>';
+        }
+        
+        document.getElementById('relatoriosList').innerHTML = html;
+        $('#relatoriosModal').modal('show');
+    })
+    .catch(error => {
+        console.error('Erro ao listar relatórios:', error);
+        alert('Erro ao listar relatórios. Verifique o console.');
+    });
+});
+</script>
+{% endblock %}    

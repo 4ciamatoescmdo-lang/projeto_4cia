@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Policial{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-shield me-2"></i>Detalhes do Policial</h1>
+        <div>
+            <a href="{% url 'cadastro_policiais:policial_update' policial.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            <a href="{% url 'cadastro_policiais:policial_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>{{ policial.get_patente_display }} {{ policial.nome_guerra }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Matrícula:</th>
+                            <td>{{ policial.matricula }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nome Completo:</th>
+                            <td>{{ policial.nome_completo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nome de Guerra:</th>
+                            <td>{{ policial.nome_guerra }}</td>
+                        </tr>
+                        <tr>
+                            <th>Patente:</th>
+                            <td>{{ policial.get_patente_display }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">CPF:</th>
+                            <td>{{ policial.cpf }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telefone:</th>
+                            <td>{{ policial.telefone }}</td>
+                        </tr>
+                        <tr>
+                            <th>Situação:</th>
+                            <td>
+                                {% if policial.ativo %}
+                                    <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Cadastrado em:</th>
+                            <td>{{ policial.criado_em|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if policial.observacoes %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>Observações</h6>
+                        </div>
+                        <div class="card-body">
+                            {{ policial.observacoes|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

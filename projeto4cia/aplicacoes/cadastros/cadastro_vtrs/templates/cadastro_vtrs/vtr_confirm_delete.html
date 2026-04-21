@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Viatura{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão</h4>
+                </div>
+                <div class="card-body">
+                    <p>Tem certeza que deseja excluir a viatura?</p>
+                    <p class="fw-bold">{{ viatura.prefixo }} - {{ viatura.marca }} {{ viatura.modelo }} ({{ viatura.placa }})</p>
+                    <p class="text-danger"><small>Esta ação não poderá ser desfeita.</small></p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>Sim, excluir
+                        </button>
+                        <a href="{% url 'cadastro_vtrs:vtr_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
