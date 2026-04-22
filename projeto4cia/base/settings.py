@@ -69,6 +69,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "base.middleware.SessionTimeoutMiddleware",
 ]
 
 ROOT_URLCONF = "base.urls"
@@ -187,3 +188,23 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.INFO: 'info',
 }
+
+
+# Adicione no final do seu settings.py
+
+# Configuração de sessão - tempo de expiração em segundos (5 minutos = 300 segundos)
+SESSION_COOKIE_AGE = 60  # 5 minutos em segundos
+
+# Forçar o navegador a enviar o cookie de sessão apenas em conexões HTTPS (recomendado para produção)
+SESSION_COOKIE_SECURE = False  # Mude para True em produção com HTTPS
+
+# Impedir que o JavaScript acesse o cookie de sessão (segurança)
+SESSION_COOKIE_HTTPONLY = True
+
+# Renovar o cookie de sessão a cada requisição (mantém a sessão ativa enquanto o usuário interage)
+SESSION_SAVE_EVERY_REQUEST = True
+
+# Fechar a sessão quando o navegador for fechado (junto com o tempo)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
