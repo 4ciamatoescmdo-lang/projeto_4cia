@@ -42,9 +42,9 @@ class EscalaGerada(models.Model):
     
     FUNCAO_CHOICES = [
         ('CMT_VTR', 'CMT DA VTR'),
-        ('MOTORISTA', 'Motorista'),
-        ('PATRULHEIRO', 'Patrulheiro'),
-        ('MOTOCICLISTA', 'Motociclista'),
+        ('MOTORISTA', 'MOT'),
+        ('PATRULHEIRO', 'PAT'),
+        ('MOTOCICLISTA', 'MOTOCICLISTA'),
     ]
     
     data_escala = models.DateField(default=timezone.now, verbose_name="Data da Escala")

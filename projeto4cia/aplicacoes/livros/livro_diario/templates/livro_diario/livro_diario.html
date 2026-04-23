@@ -1939,8 +1939,6 @@ async function gerarRelatorio() {
     }
 
     const formData = new FormData(form);
-
-    // campos extras exigidos pela view
     formData.set('texto_passagem', coletarTextoPassagem());
     formData.set('data_escala', obterDataHojeISO());
 
@@ -1948,15 +1946,35 @@ async function gerarRelatorio() {
     botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GERANDO...';
 
     try {
-        // MUDANÇA AQUI: usar a URL 'gerar_relatorio' em vez de 'salvar_relatorio'
-        const response = await fetch("{% url 'livro_diario:gerar_relatorio' %}", {
+        const url = "{% url 'livro_diario:gerar_relatorio' %}";
+        console.log('URL da requisição:', url); // Debug
+        
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': obterCSRFToken(),
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json' // ← IMPORTANTE: pede JSON explicitamente
             },
             body: formData
         });
+
+        console.log('Status da resposta:', response.status); // Debug
+        
+        // Verifica se a resposta é OK
+        if (!response.ok) {
+            const textError = await response.text();
+            console.error('Resposta de erro (HTML):', textError.substring(0, 500));
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // Verifica o Content-Type
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const htmlContent = await response.text();
+            console.error('Resposta não é JSON. Primeiros 200 caracteres:', htmlContent.substring(0, 200));
+            throw new Error('O servidor não retornou JSON. Verifique se a view está retornando JsonResponse.');
+        }
 
         const data = await response.json();
 
@@ -1967,8 +1985,8 @@ async function gerarRelatorio() {
             alert('Erro ao gerar relatório: ' + (data.message || 'erro desconhecido'));
         }
     } catch (error) {
-        console.error(error);
-        alert('Erro de comunicação ao gerar o relatório.');
+        console.error('Erro detalhado:', error);
+        alert('Erro de comunicação ao gerar o relatório: ' + error.message);
     } finally {
         botao.disabled = false;
         botao.innerHTML = '<i class="fas fa-file-alt"></i> GERAR RELATÓRIO';

@@ -84,3 +84,19 @@ Traceback (most recent call last):
   File "C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\scripts\backup_automatico.py", line 108, in autenticar_drive
     from google.oauth2.credentials import Credentials
 ModuleNotFoundError: No module named 'google'
+2026-04-22 08:30:02  INFO      =======================================================
+2026-04-22 08:30:02  INFO      INICIANDO BACKUP AUTOMÁTICO
+2026-04-22 08:30:02  INFO      =======================================================
+2026-04-22 08:30:02  INFO      Criando zip: C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\backups\database\backup_20260422_083002.zip
+2026-04-22 08:30:02  INFO        + db.sqlite3
+2026-04-22 08:30:02  INFO        + media/ (pasta)
+2026-04-22 08:30:02  INFO      Zip criado: 2.9 MB
+2026-04-22 08:30:02  INFO      Autenticando no Google Drive...
+2026-04-22 08:30:02  ERROR     ERRO NO BACKUP: No module named 'google'
+Traceback (most recent call last):
+  File "C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\scripts\backup_automatico.py", line 205, in main
+    service = autenticar_drive()
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\projeto4cia\scripts\backup_automatico.py", line 108, in autenticar_drive
+    from google.oauth2.credentials import Credentials
+ModuleNotFoundError: No module named 'google'

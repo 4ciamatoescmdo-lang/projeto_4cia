@@ -193,7 +193,7 @@ MESSAGE_TAGS = {
 # Adicione no final do seu settings.py
 
 # Configuração de sessão - tempo de expiração em segundos (5 minutos = 300 segundos)
-SESSION_COOKIE_AGE = 60  # 5 minutos em segundos
+SESSION_COOKIE_AGE = 300  # 5 minutos em segundos
 
 # Forçar o navegador a enviar o cookie de sessão apenas em conexões HTTPS (recomendado para produção)
 SESSION_COOKIE_SECURE = False  # Mude para True em produção com HTTPS
