@@ -1,4 +1,4 @@
-#!C:\Users\TCO\Downloads\GITHUB\aplicativo_4cia_2026_1-main\aplicativo_4cia_2026_1-main\.venv\Scripts\python.exe
+#!C:\Users\convidado1\Documents\GitHub\projeto_4cia\.venv\Scripts\python.exe
 
 ##############################################################################
 #
